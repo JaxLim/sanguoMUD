@@ -79,8 +79,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
         btn->setAutoDefault(false);
         btn->setDefault(false);
     }
-    btnTalk_->setText(QStringLiteral("对话 <span style='color:#9ca3af'>(J)</span>"));
-    btnAttack_->setText(QStringLiteral("攻击 <span style='color:#9ca3af'>(K)</span>"));
+    btnTalk_->setText(u8"<html><body>对话 <span style=\"color:#9ca3af;\">(J)</span></body></html>");
+    btnAttack_->setText(u8"<html><body>攻击 <span style=\"color:#9ca3af;\">(K)</span></body></html>");
     hbInteract->addWidget(btnTalk_);
     hbInteract->addWidget(btnAttack_);
     grpInteract->setLayout(hbInteract);
@@ -97,9 +97,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
         btn->setAutoDefault(false);
         btn->setDefault(false);
     }
-    btnSave_->setText(QStringLiteral("存档 <span style='color:#9ca3af'>(F5)</span>"));
-    btnLoad_->setText(QStringLiteral("读档 <span style='color:#9ca3af'>(F9)</span>"));
-    btnClear_->setText(QStringLiteral("清屏"));
+    btnSave_->setText(u8"<html><body>存档 <span style=\"color:#9ca3af;\">(F5)</span></body></html>");
+    btnLoad_->setText(u8"<html><body>读档 <span style=\"color:#9ca3af;\">(F9)</span></body></html>");
+    btnClear_->setText(u8"<html><body>清屏</body></html>");
     hbSystem->addWidget(btnSave_);
     hbSystem->addWidget(btnLoad_);
     hbSystem->addWidget(btnClear_);
