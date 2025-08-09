@@ -5,6 +5,8 @@
 #include <QPushButton>
 #include "../core/World.h"
 
+class MapWidget;
+
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
@@ -12,6 +14,7 @@ public:
 
 private:
     World world_;
+    MapWidget* map_;
     QPlainTextEdit* log_;
     QPushButton *btnN_,*btnS_,*btnW_,*btnE_,*btnTalk_,*btnAttack_,*btnSave_,*btnLoad_,*btnClear_;
     QTimer* timer_;

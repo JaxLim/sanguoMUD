@@ -9,6 +9,8 @@ add_executable(ui_qt
   main.cpp
   MainWindow.cpp
   MainWindow.h
+  MapWidget.cpp
+  MapWidget.h
 )
 
 qt5_add_resources(ui_qt_resources resources/ui_qt.qrc)

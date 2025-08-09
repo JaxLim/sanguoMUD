@@ -11,6 +11,8 @@
 #include <QFontDatabase>
 #include <QFile>
 #include <QTextCursor>
+#include <QSizePolicy>
+#include "MapWidget.h"
 #include "../core/Command.h"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
@@ -76,36 +78,45 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     leftLayout->addWidget(grpInteract);
 
     auto* grpSystem = new QGroupBox(QStringLiteral("系统"), leftPane);
-    auto* hbSystem = new QHBoxLayout();
-    hbSystem->setSpacing(8);
+    auto* gSystem = new QGridLayout();
+    gSystem->setHorizontalSpacing(8);
+    gSystem->setVerticalSpacing(8);
     btnSave_ = new QPushButton();
     btnLoad_ = new QPushButton();
     btnClear_ = new QPushButton();
-    btnSave_->setMinimumSize(110, 36);
-    btnLoad_->setMinimumSize(110, 36);
-    btnClear_->setMinimumSize(90, 36);
     for (auto btn : {btnSave_, btnLoad_, btnClear_}) {
+        btn->setMinimumSize(100, 36);
+        btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         btn->setAutoDefault(false);
         btn->setDefault(false);
     }
     btnSave_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"存档 (F5)")));
     btnLoad_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"读档 (F9)")));
     btnClear_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"清屏")));
-    hbSystem->addWidget(btnSave_);
-    hbSystem->addWidget(btnLoad_);
-    hbSystem->addWidget(btnClear_);
-    grpSystem->setLayout(hbSystem);
+    gSystem->addWidget(btnSave_, 0, 0);
+    gSystem->addWidget(btnLoad_, 0, 1);
+    gSystem->addWidget(btnClear_, 0, 2);
+    gSystem->setColumnStretch(0, 1);
+    gSystem->setColumnStretch(1, 1);
+    gSystem->setColumnStretch(2, 1);
+    grpSystem->setLayout(gSystem);
     leftLayout->addWidget(grpSystem);
 
-    log_ = new QPlainTextEdit(splitter);
+    auto* rightSplitter = new QSplitter(Qt::Vertical, splitter);
+    map_ = new MapWidget(&world_, rightSplitter);
+    log_ = new QPlainTextEdit(rightSplitter);
     log_->setReadOnly(true);
     log_->setFocusPolicy(Qt::NoFocus);
     log_->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    rightSplitter->addWidget(map_);
+    rightSplitter->addWidget(log_);
 
     splitter->addWidget(leftPane);
-    splitter->addWidget(log_);
+    splitter->addWidget(rightSplitter);
     splitter->setStretchFactor(0, 0);
     splitter->setStretchFactor(1, 1);
+    rightSplitter->setStretchFactor(0, 1);
+    rightSplitter->setStretchFactor(1, 1);
 
     setStyleSheet(
         "QWidget#LeftPane { background: #f6f3ea; }"
@@ -181,6 +192,7 @@ void MainWindow::refreshHud() {
         msg += QString(" | Data v%1").arg(dataVersion_);
     }
     statusBar()->showMessage(msg);
+    if (map_) map_->update();
 }
 
 void MainWindow::onMoveNorth() {
