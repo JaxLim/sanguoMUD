@@ -68,8 +68,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
         btn->setAutoDefault(false);
         btn->setDefault(false);
     }
-    btnTalk_->setText(QStringLiteral("对话 <font color=\"#9ca3af\">(J)</font>"));
-    btnAttack_->setText(QStringLiteral("攻击 <font color=\"#9ca3af\">(K)</font>"));
+    btnTalk_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"对话 (J)")));
+    btnAttack_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"攻击 (K)")));
     hbInteract->addWidget(btnTalk_);
     hbInteract->addWidget(btnAttack_);
     grpInteract->setLayout(hbInteract);
@@ -88,9 +88,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
         btn->setAutoDefault(false);
         btn->setDefault(false);
     }
-    btnSave_->setText(QStringLiteral("存档 <font color=\"#9ca3af\">(F5)</font>"));
-    btnLoad_->setText(QStringLiteral("读档 <font color=\"#9ca3af\">(F9)</font>"));
-    btnClear_->setText(QStringLiteral("清屏"));
+    btnSave_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"存档 (F5)")));
+    btnLoad_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"读档 (F9)")));
+    btnClear_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"清屏")));
     hbSystem->addWidget(btnSave_);
     hbSystem->addWidget(btnLoad_);
     hbSystem->addWidget(btnClear_);
