@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -7,7 +7,7 @@
 struct MapData {
 	int w = 0, h = 0;
 	std::vector<std::pair<int, int>> blocks;
-	// ¿ÉÑ¡£º´ø±êÇ©µØĞÎ
+	// å¯é€‰ï¼šå¸¦æ ‡ç­¾åœ°å½¢
 	struct Tag { int x, y; std::string type; };
 	std::vector<Tag> tags;
 };

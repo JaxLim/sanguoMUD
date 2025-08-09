@@ -3,13 +3,16 @@
 #include <QHBoxLayout>
 #include <QWidget>
 #include <QCoreApplication>
+#include <QKeyEvent>
 #include "../core/Command.h"
 
 
 MainWindow::MainWindow(QWidget* parent):QMainWindow(parent){
     auto* central = new QWidget(this);
     auto* v = new QVBoxLayout(central);
-    log_ = new QTextEdit(central); log_->setReadOnly(true);
+    log_ = new QTextEdit(central);
+    log_->setReadOnly(true);
+    log_->setFocusPolicy(Qt::NoFocus);
 
     auto* hMove = new QHBoxLayout();
     btnW_=new QPushButton("西"); btnN_=new QPushButton("北");
@@ -35,8 +38,8 @@ MainWindow::MainWindow(QWidget* parent):QMainWindow(parent){
     connect(btnTalk_, &QPushButton::clicked, this, [this]{ append(QString::fromStdString(Execute(world_, world_.playerId(), {"talk","nearest",{}}))); });
     connect(btnAttack_, &QPushButton::clicked, this, [this]{ append(QString::fromStdString(Execute(world_, world_.playerId(), {"attack","nearest",{}}))); });
 
-    connect(btnSave_, &QPushButton::clicked, this, [this]{ append(QString::fromStdString(world_.Save("save1.bin"))); });
-    connect(btnLoad_, &QPushButton::clicked, this, [this]{ append(QString::fromStdString(world_.Load("save1.bin"))); });
+    connect(btnSave_, &QPushButton::clicked, this, [this]{ append(QString::fromStdString(world_.Save("save1.json"))); });
+    connect(btnLoad_, &QPushButton::clicked, this, [this]{ append(QString::fromStdString(world_.Load("save1.json"))); });
 
     timer_ = new QTimer(this);
     connect(timer_, &QTimer::timeout, this, [this]{ world_.TickHours(1); });
@@ -45,3 +48,17 @@ MainWindow::MainWindow(QWidget* parent):QMainWindow(parent){
 
 void MainWindow::append(const QString& s){ log_->append(s); }
 void MainWindow::refreshHud(){}
+
+void MainWindow::keyPressEvent(QKeyEvent* e) {
+    switch (e->key()) {
+    case Qt::Key_W: append(QString::fromStdString(Execute(world_, world_.playerId(), { "go","north",{} }))); break;
+    case Qt::Key_S: append(QString::fromStdString(Execute(world_, world_.playerId(), { "go","south",{} }))); break;
+    case Qt::Key_A: append(QString::fromStdString(Execute(world_, world_.playerId(), { "go","west",{} })));  break;
+    case Qt::Key_D: append(QString::fromStdString(Execute(world_, world_.playerId(), { "go","east",{} })));  break;
+    case Qt::Key_Space: append(QString::fromStdString(Execute(world_, world_.playerId(), { "attack","nearest",{} }))); break;
+    case Qt::Key_Return:
+    case Qt::Key_Enter: append(QString::fromStdString(Execute(world_, world_.playerId(), { "talk","nearest",{} }))); break;
+    default:
+        QMainWindow::keyPressEvent(e);
+    }
+}

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <string>
 struct Vec2 { int x=0, y=0; };
 struct Stats { int str=5, dex=5, morale=50, hp=20; };
