@@ -87,30 +87,38 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     auto* gSystem = new QGridLayout();
     gSystem->setHorizontalSpacing(12);
     gSystem->setVerticalSpacing(8);
+    btnInfo_ = new QPushButton();
+    btnBag_ = new QPushButton();
+    btnSettings_ = new QPushButton();
     btnSave_ = new QPushButton();
     btnLoad_ = new QPushButton();
     btnClear_ = new QPushButton();
-    for (auto btn : {btnSave_, btnLoad_, btnClear_}) {
+    QList<QPushButton*> sysBtns{btnInfo_, btnBag_, btnSettings_, btnSave_, btnLoad_, btnClear_};
+    for (auto btn : sysBtns) {
         btn->setMinimumSize(92, 36);
         btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         btn->setAutoDefault(false);
         btn->setDefault(false);
     }
+    btnInfo_->setText(QStringLiteral("个人信息"));
+    btnBag_->setText(QStringLiteral("背包"));
+    btnSettings_->setText(QStringLiteral("设置"));
     btnSave_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"存档 (F5)")));
     btnLoad_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"读档 (F9)")));
     btnClear_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"清屏")));
-    gSystem->addWidget(btnSave_, 0, 0);
-    gSystem->addWidget(btnLoad_, 0, 1);
-    gSystem->addWidget(btnClear_, 0, 2);
-    gSystem->setColumnStretch(0, 1);
-    gSystem->setColumnStretch(1, 1);
-    gSystem->setColumnStretch(2, 1);
+    gSystem->addWidget(btnInfo_, 0, 0);
+    gSystem->addWidget(btnBag_, 0, 1);
+    gSystem->addWidget(btnSettings_, 0, 2);
+    gSystem->addWidget(btnSave_, 1, 0);
+    gSystem->addWidget(btnLoad_, 1, 1);
+    gSystem->addWidget(btnClear_, 1, 2);
+    for (int i = 0; i < 3; ++i) gSystem->setColumnStretch(i, 1);
     grpSystem->setLayout(gSystem);
     leftLayout->addWidget(grpSystem);
 
     auto* rightSplitter = new QSplitter(Qt::Vertical, splitter);
     map_ = new MapWidget(&world_, rightSplitter);
-    log_ = new QPlainTextEdit(rightSplitter);
+    log_ = new QTextEdit(rightSplitter);
     log_->setReadOnly(true);
     log_->setFocusPolicy(Qt::NoFocus);
     log_->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
@@ -136,7 +144,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
         "QPushButton:hover { background: #eef2ff; }"
         "QPushButton:pressed { background: #e0e7ff; }"
         "QPushButton:disabled { background: transparent; border: 1px dashed #d4d4d8; color: #9ca3af; }"
-        "QPlainTextEdit { background: #ffffff; selection-background-color: #e5e7eb; }"
+        "QTextEdit { background: #ffffff; selection-background-color: #e5e7eb; }"
         "QStatusBar { color: #374151; }"
     );
 
@@ -146,7 +154,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     if (vf.open(QIODevice::ReadOnly | QIODevice::Text)) {
         dataVersion_ = QString::fromUtf8(vf.readAll()).trimmed();
     }
-    append(QStringLiteral("世界已加载。"));
+    append(QStringLiteral("世界已加载。"), QColor("#6b7280"));
     refreshHud();
 
     auto actN = new QAction(this); actN->setShortcut(QKeySequence("W")); connect(actN, &QAction::triggered, this, &MainWindow::onMoveNorth); addAction(actN);
@@ -167,6 +175,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     connect(btnAttack_, &QPushButton::clicked, this, &MainWindow::onAttack);
     connect(btnTrade_, &QPushButton::clicked, this, &MainWindow::onTrade);
     connect(btnLeave_, &QPushButton::clicked, this, &MainWindow::onLeave);
+    connect(btnInfo_, &QPushButton::clicked, this, &MainWindow::onInfo);
+    connect(btnBag_, &QPushButton::clicked, this, &MainWindow::onBag);
+    connect(btnSettings_, &QPushButton::clicked, this, &MainWindow::onSettings);
     connect(btnSave_, &QPushButton::clicked, this, &MainWindow::onSave);
     connect(btnLoad_, &QPushButton::clicked, this, &MainWindow::onLoad);
     connect(btnClear_, &QPushButton::clicked, this, &MainWindow::onClear);
@@ -176,16 +187,20 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     timer_->start(500);
 }
 
-void MainWindow::append(const QString& s) {
-    log_->appendPlainText(s);
+void MainWindow::append(const QString& s, const QColor& color) {
+    QTextCursor c(log_->document());
+    c.movePosition(QTextCursor::End);
+    QTextCharFormat fmt;
+    fmt.setForeground(color);
+    c.insertText(s + "\n", fmt);
     auto* doc = log_->document();
     if (doc->blockCount() > 5000) {
-        QTextCursor c(doc);
-        c.movePosition(QTextCursor::Start);
+        QTextCursor rc(doc);
+        rc.movePosition(QTextCursor::Start);
         for (int i = 0; i < 100 && doc->blockCount() > 5000; ++i) {
-            c.select(QTextCursor::LineUnderCursor);
-            c.removeSelectedText();
-            c.deleteChar();
+            rc.select(QTextCursor::LineUnderCursor);
+            rc.removeSelectedText();
+            rc.deleteChar();
         }
     }
     auto* bar = log_->verticalScrollBar();
@@ -205,22 +220,22 @@ void MainWindow::refreshHud() {
 }
 
 void MainWindow::onMoveNorth() {
-    append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "north", {}})));
+    append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "north", {}})), QColor("#6b7280"));
     refreshHud();
 }
 
 void MainWindow::onMoveSouth() {
-    append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "south", {}})));
+    append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "south", {}})), QColor("#6b7280"));
     refreshHud();
 }
 
 void MainWindow::onMoveWest() {
-    append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "west", {}})));
+    append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "west", {}})), QColor("#6b7280"));
     refreshHud();
 }
 
 void MainWindow::onMoveEast() {
-    append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "east", {}})));
+    append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "east", {}})), QColor("#6b7280"));
     refreshHud();
 }
 
@@ -230,23 +245,23 @@ void MainWindow::onNpcClicked(int id) {
 }
 
 void MainWindow::onChat() {
-    if (selectedNpc_) append(QString::fromStdString(world_.Talk(world_.playerId(), selectedNpc_)));
+    if (selectedNpc_) append(QString::fromStdString(world_.Talk(world_.playerId(), selectedNpc_)), QColor("#2563eb"));
 }
 
 void MainWindow::onObserve() {
-    if (selectedNpc_) append(QStringLiteral("你仔细地观察了对方。"));
+    if (selectedNpc_) append(QStringLiteral("你仔细地观察了对方。"), QColor("#2563eb"));
 }
 
 void MainWindow::onTouch() {
-    if (selectedNpc_) append(QStringLiteral("你摸了摸对方。"));
+    if (selectedNpc_) append(QStringLiteral("你摸了摸对方。"), QColor("#2563eb"));
 }
 
 void MainWindow::onAttack() {
-    if (selectedNpc_) append(QString::fromStdString(world_.Attack(world_.playerId(), selectedNpc_)));
+    if (selectedNpc_) append(QString::fromStdString(world_.Attack(world_.playerId(), selectedNpc_)), QColor("#dc2626"));
 }
 
 void MainWindow::onTrade() {
-    if (selectedNpc_) append(QStringLiteral("目前没有可交易的物品。"));
+    if (selectedNpc_) append(QStringLiteral("目前没有可交易的物品。"), QColor("#2563eb"));
 }
 
 void MainWindow::onLeave() {
@@ -259,14 +274,26 @@ void MainWindow::clearInteraction() {
 }
 
 void MainWindow::onSave() {
-    append(QString::fromStdString(world_.Save("save1.json")));
+    append(QString::fromStdString(world_.Save("save1.json")), QColor("#6b7280"));
 }
 
 void MainWindow::onLoad() {
-    append(QString::fromStdString(world_.Load("save1.json")));
+    append(QString::fromStdString(world_.Load("save1.json")), QColor("#6b7280"));
     refreshHud();
 }
 
 void MainWindow::onClear() {
     log_->clear();
+}
+
+void MainWindow::onInfo() {
+    append(QStringLiteral("个人信息功能尚未实现。"), QColor("#6b7280"));
+}
+
+void MainWindow::onBag() {
+    append(QStringLiteral("背包暂时为空。"), QColor("#6b7280"));
+}
+
+void MainWindow::onSettings() {
+    append(QStringLiteral("设置界面暂未开放。"), QColor("#6b7280"));
 }
