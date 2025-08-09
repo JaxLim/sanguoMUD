@@ -1,8 +1,9 @@
 ﻿#pragma once
 #include <QMainWindow>
 #include <QTimer>
-#include <QPlainTextEdit>
+#include <QTextEdit>
 #include <QPushButton>
+#include <QColor>
 #include <QGroupBox>
 #include <QGridLayout>
 #include "../core/World.h"
@@ -17,8 +18,8 @@ public:
 private:
     World world_;
     MapWidget* map_;
-    QPlainTextEdit* log_;
-    QPushButton *btnN_,*btnS_,*btnW_,*btnE_,*btnSave_,*btnLoad_,*btnClear_;
+    QTextEdit* log_;
+    QPushButton *btnN_,*btnS_,*btnW_,*btnE_,*btnInfo_,*btnBag_,*btnSettings_,*btnSave_,*btnLoad_,*btnClear_;
     QGroupBox* grpInteract_;
     QGridLayout* interactLayout_;
     QPushButton *btnChat_,*btnObserve_,*btnTouch_,*btnAttack_,*btnTrade_,*btnLeave_;
@@ -26,7 +27,7 @@ private:
     QTimer* timer_;
     int tick_=0;
     QString dataVersion_;
-    void append(const QString& s);
+    void append(const QString& s, const QColor& color=Qt::black);
     void refreshHud();
     void onMoveNorth();
     void onMoveSouth();
@@ -40,6 +41,9 @@ private:
     void onTrade();
     void onLeave();
     void clearInteraction();
+    void onInfo();
+    void onBag();
+    void onSettings();
     void onSave();
     void onLoad();
     void onClear();

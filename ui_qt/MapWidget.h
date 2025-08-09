@@ -12,6 +12,7 @@ signals:
 protected:
     void paintEvent(QPaintEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
 private:
     World* world_;
     std::vector<std::pair<QRect, int>> npcRects_;
