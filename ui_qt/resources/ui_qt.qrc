@@ -6,4 +6,7 @@
     <file>icons/arrow_right.svg</file>
     <file>icons/dot_center.svg</file>
   </qresource>
+  <qresource prefix="/textures">
+    <file>textures/paper.png</file>
+  </qresource>
 </RCC>
