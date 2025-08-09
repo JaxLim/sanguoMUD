@@ -31,27 +31,16 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     auto* g = new QGridLayout();
     g->setHorizontalSpacing(8);
     g->setVerticalSpacing(8);
-    btnN_ = new QPushButton();
-    btnS_ = new QPushButton();
-    btnW_ = new QPushButton();
-    btnE_ = new QPushButton();
-    auto* btnC = new QPushButton();
+    btnN_ = new QPushButton(QStringLiteral("▲"));
+    btnS_ = new QPushButton(QStringLiteral("▼"));
+    btnW_ = new QPushButton(QStringLiteral("◀"));
+    btnE_ = new QPushButton(QStringLiteral("▶"));
+    auto* btnC = new QPushButton(QStringLiteral("•"));
     for (auto btn : {btnN_, btnS_, btnW_, btnE_, btnC}) {
         btn->setFixedSize(64, 64);
-        btn->setIconSize(QSize(28, 28));
         btn->setAutoDefault(false);
         btn->setDefault(false);
     }
-    QIcon icUp(":/icons/arrow_up.svg");
-    if (icUp.isNull()) btnN_->setText(QString::fromUtf8("▲")); else btnN_->setIcon(icUp);
-    QIcon icDown(":/icons/arrow_down.svg");
-    if (icDown.isNull()) btnS_->setText(QString::fromUtf8("▼")); else btnS_->setIcon(icDown);
-    QIcon icLeft(":/icons/arrow_left.svg");
-    if (icLeft.isNull()) btnW_->setText(QString::fromUtf8("◀")); else btnW_->setIcon(icLeft);
-    QIcon icRight(":/icons/arrow_right.svg");
-    if (icRight.isNull()) btnE_->setText(QString::fromUtf8("▶")); else btnE_->setIcon(icRight);
-    QIcon icCenter(":/icons/dot_center.svg");
-    if (icCenter.isNull()) btnC->setText(QString::fromUtf8("•")); else btnC->setIcon(icCenter);
     btnC->setEnabled(false);
     btnN_->setToolTip("W");
     btnS_->setToolTip("S");
@@ -75,12 +64,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     btnTalk_ = new QPushButton();
     btnAttack_ = new QPushButton();
     for (auto btn : {btnTalk_, btnAttack_}) {
-        btn->setMinimumSize(96, 44);
+        btn->setMinimumSize(120, 44);
         btn->setAutoDefault(false);
         btn->setDefault(false);
     }
-    btnTalk_->setText(u8"<html><body>对话 <span style=\"color:#9ca3af;\">(J)</span></body></html>");
-    btnAttack_->setText(u8"<html><body>攻击 <span style=\"color:#9ca3af;\">(K)</span></body></html>");
+    btnTalk_->setText(QStringLiteral("对话 <font color=\"#9ca3af\">(J)</font>"));
+    btnAttack_->setText(QStringLiteral("攻击 <font color=\"#9ca3af\">(K)</font>"));
     hbInteract->addWidget(btnTalk_);
     hbInteract->addWidget(btnAttack_);
     grpInteract->setLayout(hbInteract);
@@ -92,14 +81,16 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     btnSave_ = new QPushButton();
     btnLoad_ = new QPushButton();
     btnClear_ = new QPushButton();
+    btnSave_->setMinimumSize(110, 36);
+    btnLoad_->setMinimumSize(110, 36);
+    btnClear_->setMinimumSize(90, 36);
     for (auto btn : {btnSave_, btnLoad_, btnClear_}) {
-        btn->setMinimumSize(84, 36);
         btn->setAutoDefault(false);
         btn->setDefault(false);
     }
-    btnSave_->setText(u8"<html><body>存档 <span style=\"color:#9ca3af;\">(F5)</span></body></html>");
-    btnLoad_->setText(u8"<html><body>读档 <span style=\"color:#9ca3af;\">(F9)</span></body></html>");
-    btnClear_->setText(u8"<html><body>清屏</body></html>");
+    btnSave_->setText(QStringLiteral("存档 <font color=\"#9ca3af\">(F5)</font>"));
+    btnLoad_->setText(QStringLiteral("读档 <font color=\"#9ca3af\">(F9)</font>"));
+    btnClear_->setText(QStringLiteral("清屏"));
     hbSystem->addWidget(btnSave_);
     hbSystem->addWidget(btnLoad_);
     hbSystem->addWidget(btnClear_);
