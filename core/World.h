@@ -20,6 +20,8 @@ public:
     int height() const { return h_; }
     bool Walkable(Vec2 p) const;
 
+    const std::vector<Entity>& entities() const { return entities_; }
+
     const Entity* Find(EntityId id) const;
     Entity* Find(EntityId id);
 
