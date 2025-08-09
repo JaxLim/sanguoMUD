@@ -2,20 +2,11 @@
   {
     "id": 1,
     "name": "玩家",
-    "pos": [ 1, 1 ],
+    "pos": [2, 0],
     "hp": 20,
     "str": 6,
     "dex": 5,
     "morale": 50,
     "player": true
-  },
-  {
-    "id": 2,
-    "name": "李府管家",
-    "pos": [ 1, 1 ],
-    "hp": 14,
-    "str": 5,
-    "dex": 4,
-    "morale": 40
   }
 ]

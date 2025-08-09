@@ -1,39 +1,6 @@
 {
-  "w": 10,
-  "h": 8,
-  "blocks": [
-    [ 3, 3 ],
-    [ 4, 3 ],
-    [ 5, 3 ]
-  ],
-  "tags": [
-    {
-      "pos": [ 6, 2 ],
-      "type": "gate"
-    },
-    {
-      "pos": [ 2, 5 ],
-      "type": "forest"
-    },
-    {
-      "pos": [ 1, 1 ],
-      "type": "house"
-    },
-    {
-      "pos": [ 1, 0 ],
-      "type": "forest"
-    },
-    {
-      "pos": [ 1, 2 ],
-      "type": "shop"
-    },
-    {
-      "pos": [ 0, 1 ],
-      "type": "river"
-    },
-    {
-      "pos": [ 2, 1 ],
-      "type": "smith"
-    }
-  ]
+  "w": 0,
+  "h": 0,
+  "blocks": [],
+  "tags": []
 }

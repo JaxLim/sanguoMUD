@@ -4,11 +4,11 @@
 #include <optional>
 #include "Entity.h"
 #include "Data.h"
+#include "GameClock.h"
 
 class World {
 public:
     bool LoadData(const std::string& folder);
-    void TickHours(int h);
     std::string Save(const std::string& path) const;
     std::string Load(const std::string& path);
 
@@ -31,13 +31,14 @@ public:
     bool EnsureSpawnPassable();                                // 出生点自动调整
     std::optional<std::pair<EntityId, int>> NearestReachableNpc(EntityId from, int maxSteps) const; // 可达最近NPC
 
-    int hour() const { return hour_; }
+    GameClock& clock() { return clock_; }
+    const GameClock& clock() const { return clock_; }
 private:
     int w_=0, h_=0;
     std::vector<std::vector<int>> blocks_; // 0 walkable, 1 wall
     std::vector<Entity> entities_;
     EntityId playerId_ = 1;
-    int day_=1, hour_=6;
+    GameClock clock_;
     std::vector<MapData::Tag> tags_;                       // 地块标签
     std::vector<std::vector<int>> FloodStepsFrom(Vec2 start) const; // BFS 距离场
     bool InBounds(Vec2 p) const { return p.x >= 0 && p.y >= 0 && p.x < w_ && p.y < h_; }

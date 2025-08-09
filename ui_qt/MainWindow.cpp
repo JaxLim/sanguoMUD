@@ -157,6 +157,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
         dataVersion_ = QString::fromUtf8(vf.readAll()).trimmed();
     }
     append(QStringLiteral("世界已加载。"), QColor("#6b7280"));
+    lastShichen_ = world_.clock().shichen();
     refreshHud();
 
     auto actN = new QAction(this); actN->setShortcut(QKeySequence("W")); connect(actN, &QAction::triggered, this, &MainWindow::onMoveNorth); addAction(actN);
@@ -185,8 +186,17 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     connect(btnClear_, &QPushButton::clicked, this, &MainWindow::onClear);
 
     timer_ = new QTimer(this);
-    connect(timer_, &QTimer::timeout, this, [this] { world_.TickHours(1); ++tick_; refreshHud(); });
-    timer_->start(500);
+    timer_->setInterval(500);
+    connect(timer_, &QTimer::timeout, this, [this] {
+        world_.clock().advance(timer_->interval());
+        int sc = world_.clock().shichen();
+        if (sc != lastShichen_) {
+            lastShichen_ = sc;
+            ++tick_;
+            refreshHud();
+        }
+    });
+    timer_->start();
 }
 
 void MainWindow::append(const QString& s, const QColor& color) {
@@ -210,13 +220,9 @@ void MainWindow::append(const QString& s, const QColor& color) {
 }
 
 void MainWindow::refreshHud() {
-    QString msg;
-    if (auto* p = world_.Find(world_.playerId())) {
-        msg = QString("X:%1 Y:%2 | Tick:%3").arg(p->pos.x).arg(p->pos.y).arg(tick_);
-    }
-    if (!dataVersion_.isEmpty()) {
-        msg += QString(" | Data v%1").arg(dataVersion_);
-    }
+    static const char* names[] = {"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"};
+    int idx = world_.clock().shichen() % 12;
+    QString msg = QString::fromUtf8(names[idx]) + QStringLiteral("时 第") + QString::number(world_.clock().dayCount()) + QStringLiteral("日");
     statusBar()->showMessage(msg);
     if (map_) map_->update();
 }
@@ -281,6 +287,7 @@ void MainWindow::onSave() {
 
 void MainWindow::onLoad() {
     append(QString::fromStdString(world_.Load("save1.json")), QColor("#6b7280"));
+    lastShichen_ = world_.clock().shichen();
     refreshHud();
 }
 
