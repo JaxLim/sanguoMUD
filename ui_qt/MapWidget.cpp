@@ -48,10 +48,10 @@ void MapWidget::paintEvent(QPaintEvent*) {
 
     struct Dir { QRect* r; Vec2 d; const char* text; };
     Dir dirs[4] = {
-        { &rectN_, {0,-1}, u8"北" },
-        { &rectS_, {0,1},  u8"南" },
-        { &rectW_, {-1,0}, u8"西" },
-        { &rectE_, {1,0},  u8"东" }
+        { &rectN_, {0,-1}, "北" },
+        { &rectS_, {0,1},  "南" },
+        { &rectW_, {-1,0}, "西" },
+        { &rectE_, {1,0},  "东" }
     };
 
     for (auto& d : dirs) {
