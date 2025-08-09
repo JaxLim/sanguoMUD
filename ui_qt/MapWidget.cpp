@@ -24,39 +24,46 @@ void MapWidget::paintEvent(QPaintEvent*) {
     auto* player = world_->Find(world_->playerId());
     if (!player) return;
 
-    int cellSize = std::min(area.width(), area.height()) / 3;
-    int ox = area.center().x() - cellSize * 3 / 2;
-    int oy = area.center().y() - cellSize * 3 / 2;
+    int cellW = area.width() / 3;
+    int cellH = area.height() / 3;
+    int ox = area.left() + (area.width() - cellW * 3) / 2;
+    int oy = area.top() + (area.height() - cellH * 3) / 2;
+    QRect cells[3][3];
+    bool walkable[3][3] = {};
     for (int dy = -1; dy <= 1; ++dy) {
         for (int dx = -1; dx <= 1; ++dx) {
-            QRect cell(ox + (dx + 1) * cellSize, oy + (dy + 1) * cellSize, cellSize, cellSize);
+            int idx = dx + 1;
+            int idy = dy + 1;
+            QRect cell(ox + idx * cellW, oy + idy * cellH, cellW, cellH);
+            cells[idx][idy] = cell;
             Vec2 np{ player->pos.x + dx, player->pos.y + dy };
-            if (!world_->Walkable(np)) continue;
+            walkable[idx][idy] = world_->Walkable(np);
+            if (!walkable[idx][idy]) continue;
             if (dx == 0 && dy == 0) {
                 p.fillRect(cell, QColor("#fef9c3"));
             }
-            p.setPen(QColor("#d1d5db"));
-            p.drawRect(cell);
+            QPen pen(Qt::black);
+            pen.setWidth(2);
+            p.setPen(pen);
+            p.setBrush(Qt::NoBrush);
+            p.drawRoundedRect(cell, cellW / 6, cellH / 6);
             QString name = QString::fromStdString(world_->TagName(np));
             p.setPen(Qt::black);
             p.drawText(cell, Qt::AlignCenter, name);
+        }
+    }
 
-            bool hasNpc = false;
-            for (const auto& e : world_->entities()) {
-                if (e.id != player->id && e.pos.x == np.x && e.pos.y == np.y) {
-                    hasNpc = true;
-                    break;
-                }
-            }
-            if (hasNpc) {
-                int r = cellSize / 8;
-                QPoint center = cell.topLeft() + QPoint(r*2, r*2);
-                p.setBrush(QColor("#2563eb"));
-                p.setPen(Qt::NoPen);
-                p.drawEllipse(center, r, r);
-                p.setPen(Qt::black);
-                p.setBrush(Qt::NoBrush);
-            }
+    QPen connPen(Qt::black);
+    connPen.setWidth(2);
+    p.setPen(connPen);
+    for (int y = 0; y < 3; ++y) {
+        for (int x = 0; x < 3; ++x) {
+            if (!walkable[x][y]) continue;
+            QPoint c1 = cells[x][y].center();
+            if (x < 2 && walkable[x + 1][y]) p.drawLine(c1, cells[x + 1][y].center());
+            if (y < 2 && walkable[x][y + 1]) p.drawLine(c1, cells[x][y + 1].center());
+            if (x < 2 && y < 2 && walkable[x + 1][y + 1]) p.drawLine(c1, cells[x + 1][y + 1].center());
+            if (x < 2 && y > 0 && walkable[x + 1][y - 1]) p.drawLine(c1, cells[x + 1][y - 1].center());
         }
     }
 
@@ -111,11 +118,12 @@ void MapWidget::mouseMoveEvent(QMouseEvent* e) {
     QRect area = rect().adjusted(0, 0, 0, -infoH);
     auto* player = world_->Find(world_->playerId());
     if (!player) { setToolTip(QString()); return; }
-    int cellSize = std::min(area.width(), area.height()) / 3;
-    int ox = area.center().x() - cellSize * 3 / 2;
-    int oy = area.center().y() - cellSize * 3 / 2;
-    int cx = (e->pos().x() - ox) / cellSize - 1;
-    int cy = (e->pos().y() - oy) / cellSize - 1;
+    int cellW = area.width() / 3;
+    int cellH = area.height() / 3;
+    int ox = area.left() + (area.width() - cellW * 3) / 2;
+    int oy = area.top() + (area.height() - cellH * 3) / 2;
+    int cx = (e->pos().x() - ox) / cellW - 1;
+    int cy = (e->pos().y() - oy) / cellH - 1;
     if (cx < -1 || cx > 1 || cy < -1 || cy > 1) { setToolTip(QString()); return; }
     Vec2 np{ player->pos.x + cx, player->pos.y + cy };
     if (!world_->Walkable(np)) { setToolTip(QString()); return; }
