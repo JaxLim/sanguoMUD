@@ -1,31 +1,53 @@
 #include "MainWindow.h"
 #include <QVBoxLayout>
-#include <QHBoxLayout>
+#include <QGridLayout>
+#include <QGroupBox>
 #include <QWidget>
 #include <QCoreApplication>
 #include <QKeyEvent>
+#include <QFont>
 #include "../core/Command.h"
 
 
 MainWindow::MainWindow(QWidget* parent):QMainWindow(parent){
+    resize(1280,960);
+
     auto* central = new QWidget(this);
     auto* v = new QVBoxLayout(central);
     log_ = new QTextEdit(central);
     log_->setReadOnly(true);
     log_->setFocusPolicy(Qt::NoFocus);
+    log_->setFont(QFont("Consolas",11));
 
-    auto* hMove = new QHBoxLayout();
-    btnW_=new QPushButton("西"); btnN_=new QPushButton("北");
-    btnS_=new QPushButton("南"); btnE_=new QPushButton("东");
-    hMove->addWidget(btnW_); hMove->addWidget(btnN_); hMove->addWidget(btnS_); hMove->addWidget(btnE_);
+    auto* grpMove = new QGroupBox(QStringLiteral("移动"), central);
+    auto* gMove = new QGridLayout();
+    btnN_=new QPushButton(QStringLiteral("北(W)"));
+    btnS_=new QPushButton(QStringLiteral("南(S)"));
+    btnW_=new QPushButton(QStringLiteral("西(A)"));
+    btnE_=new QPushButton(QStringLiteral("东(D)"));
+    gMove->addWidget(btnN_,0,1);
+    gMove->addWidget(btnW_,1,0);
+    gMove->addWidget(btnE_,1,2);
+    gMove->addWidget(btnS_,2,1);
+    grpMove->setLayout(gMove);
 
-    auto* hAct = new QHBoxLayout();
-    btnTalk_=new QPushButton("对话"); btnAttack_=new QPushButton("攻击");
-    btnSave_=new QPushButton("存档"); btnLoad_=new QPushButton("读档");
-    hAct->addWidget(btnTalk_); hAct->addWidget(btnAttack_); hAct->addWidget(btnSave_); hAct->addWidget(btnLoad_);
+    auto* grpAct = new QGroupBox(QStringLiteral("动作"), central);
+    auto* gAct = new QGridLayout();
+    btnTalk_=new QPushButton(QStringLiteral("对话(Enter)"));
+    btnAttack_=new QPushButton(QStringLiteral("攻击(Space)"));
+    btnSave_=new QPushButton(QStringLiteral("存档"));
+    btnLoad_=new QPushButton(QStringLiteral("读档"));
+    gAct->addWidget(btnTalk_,0,0);
+    gAct->addWidget(btnAttack_,0,1);
+    gAct->addWidget(btnSave_,1,0);
+    gAct->addWidget(btnLoad_,1,1);
+    grpAct->setLayout(gAct);
 
-    v->addWidget(log_); v->addLayout(hMove); v->addLayout(hAct);
+    v->addWidget(log_);
+    v->addWidget(grpMove);
+    v->addWidget(grpAct);
     setCentralWidget(central);
+    setStyleSheet("QPushButton{min-width:120px;min-height:48px;font-size:14px;border-radius:6px;} QPushButton:hover{background-color:#e0e0e0;}");
 
     world_.LoadData((QCoreApplication::applicationDirPath()+"/../data").toStdString());
     append("世界已加载。");
