@@ -123,14 +123,14 @@ MainWindow::MainWindow(QWidget* parent):QMainWindow(parent){
     connect(btnLoad_, &QPushButton::clicked, this, load);
     connect(btnClear_, &QPushButton::clicked, this, clearLog);
 
-    auto* actN = new QAction(this); actN->setShortcut(Qt::Key_W); connect(actN, &QAction::triggered, this, moveNorth);
-    auto* actS = new QAction(this); actS->setShortcut(Qt::Key_S); connect(actS, &QAction::triggered, this, moveSouth);
-    auto* actW = new QAction(this); actW->setShortcut(Qt::Key_A); connect(actW, &QAction::triggered, this, moveWest);
-    auto* actE = new QAction(this); actE->setShortcut(Qt::Key_D); connect(actE, &QAction::triggered, this, moveEast);
-    auto* actTalk = new QAction(this); actTalk->setShortcut(Qt::Key_J); connect(actTalk, &QAction::triggered, this, talk);
-    auto* actAttack = new QAction(this); actAttack->setShortcut(Qt::Key_K); connect(actAttack, &QAction::triggered, this, attack);
-    auto* actSave = new QAction(this); actSave->setShortcut(Qt::Key_F5); connect(actSave, &QAction::triggered, this, save);
-    auto* actLoad = new QAction(this); actLoad->setShortcut(Qt::Key_F9); connect(actLoad, &QAction::triggered, this, load);
+    auto* actN = new QAction(this); actN->setShortcut(Qt::Key_W); connect(actN, &QAction::triggered, this, moveNorth); addAction(actN);
+    auto* actS = new QAction(this); actS->setShortcut(Qt::Key_S); connect(actS, &QAction::triggered, this, moveSouth); addAction(actS);
+    auto* actW = new QAction(this); actW->setShortcut(Qt::Key_A); connect(actW, &QAction::triggered, this, moveWest); addAction(actW);
+    auto* actE = new QAction(this); actE->setShortcut(Qt::Key_D); connect(actE, &QAction::triggered, this, moveEast); addAction(actE);
+    auto* actTalk = new QAction(this); actTalk->setShortcut(Qt::Key_J); connect(actTalk, &QAction::triggered, this, talk); addAction(actTalk);
+    auto* actAttack = new QAction(this); actAttack->setShortcut(Qt::Key_K); connect(actAttack, &QAction::triggered, this, attack); addAction(actAttack);
+    auto* actSave = new QAction(this); actSave->setShortcut(Qt::Key_F5); connect(actSave, &QAction::triggered, this, save); addAction(actSave);
+    auto* actLoad = new QAction(this); actLoad->setShortcut(Qt::Key_F9); connect(actLoad, &QAction::triggered, this, load); addAction(actLoad);
 
     timer_ = new QTimer(this);
     connect(timer_, &QTimer::timeout, this, [this]{ world_.TickHours(1); ++tick_; refreshHud(); });
