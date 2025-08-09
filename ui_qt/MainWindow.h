@@ -16,6 +16,16 @@ private:
     QPushButton *btnN_,*btnS_,*btnW_,*btnE_,*btnTalk_,*btnAttack_,*btnSave_,*btnLoad_,*btnClear_;
     QTimer* timer_;
     int tick_=0;
+    QString dataVersion_;
     void append(const QString& s);
     void refreshHud();
+    void onMoveNorth();
+    void onMoveSouth();
+    void onMoveWest();
+    void onMoveEast();
+    void onTalk();
+    void onAttack();
+    void onSave();
+    void onLoad();
+    void onClear();
 };
