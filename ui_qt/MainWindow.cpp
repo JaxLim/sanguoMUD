@@ -63,8 +63,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     grpInteract_ = new QGroupBox(QStringLiteral("交互"), leftPane);
     interactLayout_ = new QGridLayout();
-    interactLayout_->setHorizontalSpacing(8);
-    interactLayout_->setVerticalSpacing(12);
+    interactLayout_->setContentsMargins(0, 8, 0, 8);
+    interactLayout_->setHorizontalSpacing(12);
+    interactLayout_->setVerticalSpacing(16);
     btnChat_ = new QPushButton(QStringLiteral("聊天"));
     btnObserve_ = new QPushButton(QStringLiteral("观察"));
     btnTouch_ = new QPushButton(QStringLiteral("触摸"));
@@ -85,8 +86,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     auto* grpSystem = new QGroupBox(QStringLiteral("系统"), leftPane);
     auto* gSystem = new QGridLayout();
-    gSystem->setHorizontalSpacing(12);
-    gSystem->setVerticalSpacing(12);
+    gSystem->setContentsMargins(0, 8, 0, 8);
+    gSystem->setHorizontalSpacing(16);
+    gSystem->setVerticalSpacing(16);
     btnInfo_ = new QPushButton();
     btnBag_ = new QPushButton();
     btnSettings_ = new QPushButton();

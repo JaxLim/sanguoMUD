@@ -24,17 +24,20 @@ void MapWidget::paintEvent(QPaintEvent*) {
     auto* player = world_->Find(world_->playerId());
     if (!player) return;
 
-    int cellW = area.width() / 3;
-    int cellH = area.height() / 3;
-    int ox = area.left() + (area.width() - cellW * 3) / 2;
-    int oy = area.top() + (area.height() - cellH * 3) / 2;
+    const int gap = 12;
+    int cellW = (area.width() - gap * 2) / 3;
+    int cellH = (area.height() - gap * 2) / 3;
+    int totalW = cellW * 3 + gap * 2;
+    int totalH = cellH * 3 + gap * 2;
+    int ox = area.left() + (area.width() - totalW) / 2;
+    int oy = area.top() + (area.height() - totalH) / 2;
     QRect cells[3][3];
     bool walkable[3][3] = {};
     for (int dy = -1; dy <= 1; ++dy) {
         for (int dx = -1; dx <= 1; ++dx) {
             int idx = dx + 1;
             int idy = dy + 1;
-            QRect cell(ox + idx * cellW, oy + idy * cellH, cellW, cellH);
+            QRect cell(ox + idx * (cellW + gap), oy + idy * (cellH + gap), cellW, cellH);
             cells[idx][idy] = cell;
             Vec2 np{ player->pos.x + dx, player->pos.y + dy };
             walkable[idx][idy] = world_->Walkable(np);
@@ -42,28 +45,36 @@ void MapWidget::paintEvent(QPaintEvent*) {
             if (dx == 0 && dy == 0) {
                 p.fillRect(cell, QColor("#fef9c3"));
             }
-            QPen pen(Qt::black);
-            pen.setWidth(2);
+            QPen pen(QColor("#cbd5e1"));
+            pen.setWidth(1);
             p.setPen(pen);
             p.setBrush(Qt::NoBrush);
-            p.drawRoundedRect(cell, cellW / 6, cellH / 6);
+            p.drawRoundedRect(cell, 6, 6);
             QString name = QString::fromStdString(world_->TagName(np));
             p.setPen(Qt::black);
             p.drawText(cell, Qt::AlignCenter, name);
         }
     }
 
-    QPen connPen(Qt::black);
-    connPen.setWidth(2);
+    QPen connPen(QColor("#d1d5db"));
+    connPen.setWidth(1);
     p.setPen(connPen);
     for (int y = 0; y < 3; ++y) {
         for (int x = 0; x < 3; ++x) {
             if (!walkable[x][y]) continue;
-            QPoint c1 = cells[x][y].center();
-            if (x < 2 && walkable[x + 1][y]) p.drawLine(c1, cells[x + 1][y].center());
-            if (y < 2 && walkable[x][y + 1]) p.drawLine(c1, cells[x][y + 1].center());
-            if (x < 2 && y < 2 && walkable[x + 1][y + 1]) p.drawLine(c1, cells[x + 1][y + 1].center());
-            if (x < 2 && y > 0 && walkable[x + 1][y - 1]) p.drawLine(c1, cells[x + 1][y - 1].center());
+            QRect c = cells[x][y];
+            if (x < 2 && walkable[x + 1][y]) {
+                int x1 = c.right();
+                int x2 = cells[x + 1][y].left();
+                int yy = (c.top() + c.bottom()) / 2;
+                p.drawLine(QPoint(x1, yy), QPoint(x2, yy));
+            }
+            if (y < 2 && walkable[x][y + 1]) {
+                int y1 = c.bottom();
+                int y2 = cells[x][y + 1].top();
+                int xx = (c.left() + c.right()) / 2;
+                p.drawLine(QPoint(xx, y1), QPoint(xx, y2));
+            }
         }
     }
 
@@ -118,22 +129,30 @@ void MapWidget::mouseMoveEvent(QMouseEvent* e) {
     QRect area = rect().adjusted(0, 0, 0, -infoH);
     auto* player = world_->Find(world_->playerId());
     if (!player) { setToolTip(QString()); return; }
-    int cellW = area.width() / 3;
-    int cellH = area.height() / 3;
-    int ox = area.left() + (area.width() - cellW * 3) / 2;
-    int oy = area.top() + (area.height() - cellH * 3) / 2;
-    int cx = (e->pos().x() - ox) / cellW - 1;
-    int cy = (e->pos().y() - oy) / cellH - 1;
-    if (cx < -1 || cx > 1 || cy < -1 || cy > 1) { setToolTip(QString()); return; }
-    Vec2 np{ player->pos.x + cx, player->pos.y + cy };
-    if (!world_->Walkable(np)) { setToolTip(QString()); return; }
-    QString tip = QString::fromStdString(world_->TagName(np));
-    QStringList names;
-    for (const auto& en : world_->entities()) {
-        if (en.id != player->id && en.pos.x == np.x && en.pos.y == np.y) {
-            names << QString::fromStdString(en.name);
+    const int gap = 12;
+    int cellW = (area.width() - gap * 2) / 3;
+    int cellH = (area.height() - gap * 2) / 3;
+    int totalW = cellW * 3 + gap * 2;
+    int totalH = cellH * 3 + gap * 2;
+    int ox = area.left() + (area.width() - totalW) / 2;
+    int oy = area.top() + (area.height() - totalH) / 2;
+    for (int dy = -1; dy <= 1; ++dy) {
+        for (int dx = -1; dx <= 1; ++dx) {
+            QRect cell(ox + (dx + 1) * (cellW + gap), oy + (dy + 1) * (cellH + gap), cellW, cellH);
+            if (!cell.contains(e->pos())) continue;
+            Vec2 np{ player->pos.x + dx, player->pos.y + dy };
+            if (!world_->Walkable(np)) { setToolTip(QString()); return; }
+            QString tip = QString::fromStdString(world_->TagName(np));
+            QStringList names;
+            for (const auto& en : world_->entities()) {
+                if (en.id != player->id && en.pos.x == np.x && en.pos.y == np.y) {
+                    names << QString::fromStdString(en.name);
+                }
+            }
+            if (!names.isEmpty()) tip += QStringLiteral("\nNPC: ") + names.join(", ");
+            setToolTip(tip);
+            return;
         }
     }
-    if (!names.isEmpty()) tip += QStringLiteral("\nNPC: ") + names.join(", ");
-    setToolTip(tip);
+    setToolTip(QString());
 }
