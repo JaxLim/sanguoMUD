@@ -156,6 +156,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     connect(btnS_, &QPushButton::clicked, this, &MainWindow::onMoveSouth);
     connect(btnW_, &QPushButton::clicked, this, &MainWindow::onMoveWest);
     connect(btnE_, &QPushButton::clicked, this, &MainWindow::onMoveEast);
+    connect(map_, &MapWidget::moveNorth, this, &MainWindow::onMoveNorth);
+    connect(map_, &MapWidget::moveSouth, this, &MainWindow::onMoveSouth);
+    connect(map_, &MapWidget::moveWest, this, &MainWindow::onMoveWest);
+    connect(map_, &MapWidget::moveEast, this, &MainWindow::onMoveEast);
     connect(btnTalk_, &QPushButton::clicked, this, &MainWindow::onTalk);
     connect(btnAttack_, &QPushButton::clicked, this, &MainWindow::onAttack);
     connect(btnSave_, &QPushButton::clicked, this, &MainWindow::onSave);
