@@ -23,7 +23,7 @@ bool World::LoadData(const std::string& folder) {
     w_ = m.w; h_ = m.h;
     blocks_.assign(h_, std::vector<int>(w_, 0));
     for (auto [x, y] : m.blocks) if (y >= 0 && y < h_ && x >= 0 && x < w_) blocks_[y][x] = 1;
-    // 需要的话把 m.tags 保存下来以便地形修正
+    tags_ = m.tags;
 
     std::vector<Entity> loaded;
     if (!LoadEntitiesJson(folder + "/entities.json", loaded, &err)) { return false; }
@@ -86,6 +86,21 @@ std::string World::Attack(EntityId a, EntityId b){
     }else{
         return A->name+"挥空了。";
     }
+}
+
+std::string World::TagName(Vec2 p) const {
+    for (const auto& t : tags_) {
+        if (t.x == p.x && t.y == p.y) {
+            if (t.type == "forest") return "树林";
+            if (t.type == "river") return "河边";
+            if (t.type == "smith") return "铁匠铺";
+            if (t.type == "shop") return "商铺";
+            if (t.type == "gate") return "城门";
+            if (t.type == "house") return "李府";
+            return t.type;
+        }
+    }
+    return "街道";
 }
 
 std::string World::Save(const std::string& path) const {

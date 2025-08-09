@@ -3,6 +3,7 @@
 #include <string>
 #include <optional>
 #include "Entity.h"
+#include "Data.h"
 
 class World {
 public:
@@ -25,6 +26,8 @@ public:
     const Entity* Find(EntityId id) const;
     Entity* Find(EntityId id);
 
+    std::string TagName(Vec2 p) const;                     // 地块名称
+
     bool EnsureSpawnPassable();                                // 出生点自动调整
     std::optional<std::pair<EntityId, int>> NearestReachableNpc(EntityId from, int maxSteps) const; // 可达最近NPC
 private:
@@ -33,6 +36,7 @@ private:
     std::vector<Entity> entities_;
     EntityId playerId_ = 1;
     int day_=1, hour_=6;
+    std::vector<MapData::Tag> tags_;                       // 地块标签
     std::vector<std::vector<int>> FloodStepsFrom(Vec2 start) const; // BFS 距离场
     bool InBounds(Vec2 p) const { return p.x >= 0 && p.y >= 0 && p.x < w_ && p.y < h_; }
     std::string dataFolder_;

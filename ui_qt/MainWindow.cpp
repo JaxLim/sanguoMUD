@@ -4,6 +4,7 @@
 #include <QHBoxLayout>
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QList>
 #include <QAction>
 #include <QCoreApplication>
 #include <QScrollBar>
@@ -60,22 +61,27 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     grpMove->setLayout(g);
     leftLayout->addWidget(grpMove);
 
-    auto* grpInteract = new QGroupBox(QStringLiteral("交互"), leftPane);
-    auto* hbInteract = new QHBoxLayout();
-    hbInteract->setSpacing(8);
-    btnTalk_ = new QPushButton();
-    btnAttack_ = new QPushButton();
-    for (auto btn : {btnTalk_, btnAttack_}) {
-        btn->setMinimumSize(120, 44);
+    grpInteract_ = new QGroupBox(QStringLiteral("交互"), leftPane);
+    interactLayout_ = new QGridLayout();
+    interactLayout_->setHorizontalSpacing(8);
+    interactLayout_->setVerticalSpacing(8);
+    btnChat_ = new QPushButton(QStringLiteral("聊天"));
+    btnObserve_ = new QPushButton(QStringLiteral("观察"));
+    btnTouch_ = new QPushButton(QStringLiteral("触摸"));
+    btnAttack_ = new QPushButton(QStringLiteral("攻击"));
+    btnTrade_ = new QPushButton(QStringLiteral("交易"));
+    btnLeave_ = new QPushButton(QStringLiteral("离开"));
+    QList<QPushButton*> ibtns{btnChat_, btnObserve_, btnTouch_, btnAttack_, btnTrade_, btnLeave_};
+    for (int i = 0; i < ibtns.size(); ++i) {
+        auto btn = ibtns[i];
+        btn->setMinimumSize(92, 36);
         btn->setAutoDefault(false);
         btn->setDefault(false);
+        btn->hide();
+        interactLayout_->addWidget(btn, i / 3, i % 3);
     }
-    btnTalk_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"对话 (J)")));
-    btnAttack_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"攻击 (K)")));
-    hbInteract->addWidget(btnTalk_);
-    hbInteract->addWidget(btnAttack_);
-    grpInteract->setLayout(hbInteract);
-    leftLayout->addWidget(grpInteract);
+    grpInteract_->setLayout(interactLayout_);
+    leftLayout->addWidget(grpInteract_);
 
     auto* grpSystem = new QGroupBox(QStringLiteral("系统"), leftPane);
     auto* gSystem = new QGridLayout();
@@ -147,8 +153,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     auto actS = new QAction(this); actS->setShortcut(QKeySequence("S")); connect(actS, &QAction::triggered, this, &MainWindow::onMoveSouth); addAction(actS);
     auto actW = new QAction(this); actW->setShortcut(QKeySequence("A")); connect(actW, &QAction::triggered, this, &MainWindow::onMoveWest); addAction(actW);
     auto actE = new QAction(this); actE->setShortcut(QKeySequence("D")); connect(actE, &QAction::triggered, this, &MainWindow::onMoveEast); addAction(actE);
-    auto actTalk = new QAction(this); actTalk->setShortcut(QKeySequence("J")); connect(actTalk, &QAction::triggered, this, &MainWindow::onTalk); addAction(actTalk);
-    auto actAttack = new QAction(this); actAttack->setShortcut(QKeySequence("K")); connect(actAttack, &QAction::triggered, this, &MainWindow::onAttack); addAction(actAttack);
     auto actSave = new QAction(this); actSave->setShortcut(QKeySequence("F5")); connect(actSave, &QAction::triggered, this, &MainWindow::onSave); addAction(actSave);
     auto actLoad = new QAction(this); actLoad->setShortcut(QKeySequence("F9")); connect(actLoad, &QAction::triggered, this, &MainWindow::onLoad); addAction(actLoad);
 
@@ -156,12 +160,13 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     connect(btnS_, &QPushButton::clicked, this, &MainWindow::onMoveSouth);
     connect(btnW_, &QPushButton::clicked, this, &MainWindow::onMoveWest);
     connect(btnE_, &QPushButton::clicked, this, &MainWindow::onMoveEast);
-    connect(map_, &MapWidget::moveNorth, this, &MainWindow::onMoveNorth);
-    connect(map_, &MapWidget::moveSouth, this, &MainWindow::onMoveSouth);
-    connect(map_, &MapWidget::moveWest, this, &MainWindow::onMoveWest);
-    connect(map_, &MapWidget::moveEast, this, &MainWindow::onMoveEast);
-    connect(btnTalk_, &QPushButton::clicked, this, &MainWindow::onTalk);
+    connect(map_, &MapWidget::npcClicked, this, &MainWindow::onNpcClicked);
+    connect(btnChat_, &QPushButton::clicked, this, &MainWindow::onChat);
+    connect(btnObserve_, &QPushButton::clicked, this, &MainWindow::onObserve);
+    connect(btnTouch_, &QPushButton::clicked, this, &MainWindow::onTouch);
     connect(btnAttack_, &QPushButton::clicked, this, &MainWindow::onAttack);
+    connect(btnTrade_, &QPushButton::clicked, this, &MainWindow::onTrade);
+    connect(btnLeave_, &QPushButton::clicked, this, &MainWindow::onLeave);
     connect(btnSave_, &QPushButton::clicked, this, &MainWindow::onSave);
     connect(btnLoad_, &QPushButton::clicked, this, &MainWindow::onLoad);
     connect(btnClear_, &QPushButton::clicked, this, &MainWindow::onClear);
@@ -219,14 +224,38 @@ void MainWindow::onMoveEast() {
     refreshHud();
 }
 
-void MainWindow::onTalk() {
-    append(QString::fromStdString(Execute(world_, world_.playerId(), {"talk", "nearest", {}})));
-    refreshHud();
+void MainWindow::onNpcClicked(int id) {
+    selectedNpc_ = id;
+    for (auto btn : {btnChat_, btnObserve_, btnTouch_, btnAttack_, btnTrade_, btnLeave_}) btn->show();
+}
+
+void MainWindow::onChat() {
+    if (selectedNpc_) append(QString::fromStdString(world_.Talk(world_.playerId(), selectedNpc_)));
+}
+
+void MainWindow::onObserve() {
+    if (selectedNpc_) append(QStringLiteral("你仔细地观察了对方。"));
+}
+
+void MainWindow::onTouch() {
+    if (selectedNpc_) append(QStringLiteral("你摸了摸对方。"));
 }
 
 void MainWindow::onAttack() {
-    append(QString::fromStdString(Execute(world_, world_.playerId(), {"attack", "nearest", {}})));
-    refreshHud();
+    if (selectedNpc_) append(QString::fromStdString(world_.Attack(world_.playerId(), selectedNpc_)));
+}
+
+void MainWindow::onTrade() {
+    if (selectedNpc_) append(QStringLiteral("目前没有可交易的物品。"));
+}
+
+void MainWindow::onLeave() {
+    clearInteraction();
+}
+
+void MainWindow::clearInteraction() {
+    selectedNpc_ = 0;
+    for (auto btn : {btnChat_, btnObserve_, btnTouch_, btnAttack_, btnTrade_, btnLeave_}) btn->hide();
 }
 
 void MainWindow::onSave() {
