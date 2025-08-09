@@ -8,6 +8,8 @@
 #include <queue>
 #include <json.hpp>
 #include <iostream>
+#include <filesystem>
+#include <stdexcept>
 using json = nlohmann::json;
 
 static int clamp(int v,int lo,int hi){ return std::max(lo,std::min(hi,v)); }
@@ -16,30 +18,59 @@ static int roll(){ static std::mt19937 rng{std::random_device{}()}; return std::
 static int damage(const Stats& a){ static std::mt19937 rng{std::random_device{}()}; return std::uniform_int_distribution<int>(std::max(1,a.str-2), a.str+2)(rng); }
 
 bool World::LoadData(const std::string& folder) {
-    dataFolder_ = folder;
-    std::string err;
+    namespace fs = std::filesystem;
+    fs::path dir = fs::absolute(fs::path(folder));
+    dataFolder_ = dir.generic_string();
 
-    MapData m;
-    if (!LoadMapJson(folder + "/luoyang_palace.json", m, &err)) {
-        std::cerr << "加载地图失败: " << err << std::endl;
-        w_ = h_ = 0;
-        blocks_.clear();
-        tags_.clear();
-        entities_.clear();
-        return false;
+    fs::path configPath = dir / "config.json";
+    std::string mapName = "map.json";
+    if (fs::exists(configPath)) {
+        try {
+            json cfg;
+            std::ifstream cf(configPath);
+            cf >> cfg;
+            mapName = cfg.value("current_map", mapName);
+        }
+        catch (const std::exception& e) {
+            std::cerr << "读取配置失败: " << configPath.generic_string() << ": " << e.what() << std::endl;
+        }
     }
+
+    fs::path mapPath = fs::absolute(dir / mapName);
+    fs::path fallbackPath = fs::absolute(dir / "map.json");
+
+    std::string err;
+    MapData m;
+    fs::path loadedPath;
+    if (LoadMapJson(mapPath.generic_string(), m, &err)) {
+        loadedPath = mapPath;
+    }
+    else {
+        std::cerr << "加载地图失败: " << err << " (" << mapPath.generic_string() << ")" << std::endl;
+        if (LoadMapJson(fallbackPath.generic_string(), m, &err)) {
+            loadedPath = fallbackPath;
+        }
+        else {
+            std::string msg = "无法加载地图，尝试路径: " + mapPath.generic_string() + ", " + fallbackPath.generic_string() + "; 数据目录: " + dir.generic_string();
+            throw std::runtime_error(msg);
+        }
+    }
+
     w_ = m.w; h_ = m.h;
     blocks_.assign(h_, std::vector<int>(w_, 0));
     for (auto [x, y] : m.blocks) if (y >= 0 && y < h_ && x >= 0 && x < w_) blocks_[y][x] = 1;
     tags_ = m.tags;
 
+    mapFile_ = loadedPath.filename().generic_string();
+    std::cout << "已加载地图: " << mapFile_ << " (" << w_ * h_ << "/" << m.version << ")" << std::endl;
+
     std::vector<Entity> loaded;
-    if (!LoadEntitiesJson(folder + "/entities.json", loaded, &err)) { return false; }
+    if (!LoadEntitiesJson((dir / "entities.json").generic_string(), loaded, &err)) { return false; }
     entities_ = std::move(loaded);
     for (auto& e : entities_) if (e.isPlayer) playerId_ = e.id;
 
     DialogMap dlg;
-    LoadDialogsJson(folder + "/dialogs.json", dlg, &err); // 读不到也不致命
+    LoadDialogsJson((dir / "dialogs.json").generic_string(), dlg, &err); // 读不到也不致命
 
     EnsureSpawnPassable();
     return true;
@@ -161,7 +192,9 @@ std::string World::Load(const std::string& path) {
     if (!dataFolder_.empty()) {
         std::string err2;
         MapData m2;
-        if (LoadMapJson(dataFolder_ + "/luoyang_palace.json", m2, &err2)) {
+        namespace fs = std::filesystem;
+        fs::path mp = fs::path(dataFolder_) / mapFile_;
+        if (LoadMapJson(mp.generic_string(), m2, &err2)) {
             blocks_.assign(h_, std::vector<int>(w_, 0));
             for (auto [x, y] : m2.blocks) if (y >= 0 && y < h_ && x >= 0 && x < w_) blocks_[y][x] = 1;
         }
