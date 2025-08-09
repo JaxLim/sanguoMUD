@@ -18,4 +18,5 @@ protected:
 private:
     World* world_;
     QRect rectN_, rectS_, rectW_, rectE_, rectC_;
+    bool canN_=false, canS_=false, canW_=false, canE_=false;
 };

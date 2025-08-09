@@ -79,13 +79,13 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     auto* grpSystem = new QGroupBox(QStringLiteral("系统"), leftPane);
     auto* gSystem = new QGridLayout();
-    gSystem->setHorizontalSpacing(8);
+    gSystem->setHorizontalSpacing(12);
     gSystem->setVerticalSpacing(8);
     btnSave_ = new QPushButton();
     btnLoad_ = new QPushButton();
     btnClear_ = new QPushButton();
     for (auto btn : {btnSave_, btnLoad_, btnClear_}) {
-        btn->setMinimumSize(100, 36);
+        btn->setMinimumSize(92, 36);
         btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         btn->setAutoDefault(false);
         btn->setDefault(false);
