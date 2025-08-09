@@ -7,6 +7,7 @@
 #include <random>
 #include <queue>
 #include <json.hpp>
+#include <iostream>
 using json = nlohmann::json;
 
 static int clamp(int v,int lo,int hi){ return std::max(lo,std::min(hi,v)); }
@@ -19,7 +20,14 @@ bool World::LoadData(const std::string& folder) {
     std::string err;
 
     MapData m;
-    if (!LoadMapJson(folder + "/map.json", m, &err)) { /* 你也可以把 err 打到 UI */ return false; }
+    if (!LoadMapJson(folder + "/luoyang_palace.json", m, &err)) {
+        std::cerr << "加载地图失败: " << err << std::endl;
+        w_ = h_ = 0;
+        blocks_.clear();
+        tags_.clear();
+        entities_.clear();
+        return false;
+    }
     w_ = m.w; h_ = m.h;
     blocks_.assign(h_, std::vector<int>(w_, 0));
     for (auto [x, y] : m.blocks) if (y >= 0 && y < h_ && x >= 0 && x < w_) blocks_[y][x] = 1;
@@ -32,20 +40,11 @@ bool World::LoadData(const std::string& folder) {
 
     DialogMap dlg;
     LoadDialogsJson(folder + "/dialogs.json", dlg, &err); // 读不到也不致命
-    // 先偷懒：对话直接用固定文本，你以后可以把 dlg 存起来按 id 查
 
-    // 新增：启动时校验出生点
     EnsureSpawnPassable();
     return true;
 }
 
-
-void World::TickHours(int h){
-    hour_ += h;
-    while(hour_>=24){ hour_-=24; day_++; }
-    // 先打个证明活着
-    // 真正的事件系统以后再加
-}
 
 bool World::Walkable(Vec2 p) const {
     if(p.x<0||p.y<0||p.x>=w_||p.y>=h_) return false;
@@ -106,7 +105,8 @@ std::string World::TagName(Vec2 p) const {
 std::string World::Save(const std::string& path) const {
     json j;
     j["w"] = w_; j["h"] = h_;
-    j["day"] = day_; j["hour"] = hour_;
+    j["day"] = clock_.dayCount();
+    j["day_ms"] = clock_.dayMs();
     j["entities"] = json::array();
     for (const auto& e : entities_) {
         j["entities"].push_back({
@@ -136,8 +136,9 @@ std::string World::Load(const std::string& path) {
 
     w_ = j.value("w", w_);
     h_ = j.value("h", h_);
-    day_ = j.value("day", day_);
-    hour_ = j.value("hour", hour_);
+    int d = j.value("day", 1);
+    int ms = j.value("day_ms", 0);
+    clock_.set(d, ms);
 
     entities_.clear();
     for (const auto& je : j["entities"]) {
@@ -160,7 +161,7 @@ std::string World::Load(const std::string& path) {
     if (!dataFolder_.empty()) {
         std::string err2;
         MapData m2;
-        if (LoadMapJson(dataFolder_ + "/map.json", m2, &err2)) {
+        if (LoadMapJson(dataFolder_ + "/luoyang_palace.json", m2, &err2)) {
             blocks_.assign(h_, std::vector<int>(w_, 0));
             for (auto [x, y] : m2.blocks) if (y >= 0 && y < h_ && x >= 0 && x < w_) blocks_[y][x] = 1;
         }

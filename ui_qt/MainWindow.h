@@ -26,6 +26,7 @@ private:
     EntityId selectedNpc_ = 0;
     QTimer* timer_;
     int tick_=0;
+    int lastShichen_ = -1;
     QString dataVersion_;
     void append(const QString& s, const QColor& color=Qt::black);
     void refreshHud();

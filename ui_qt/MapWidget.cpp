@@ -99,10 +99,10 @@ void MapWidget::paintEvent(QPaintEvent*) {
     }
 
     // draw current time at top-right of map area
-    auto hourText = [h = world_->hour()]() -> QString {
+    auto hourText = [idx = world_->clock().shichen()]() -> QString {
         static const char* names[] = {"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"};
-        int idx = ((h % 24) + 1) / 2 % 12;
-        return QString::fromUtf8(names[idx]) + QStringLiteral("时");
+        int i = (idx % 12 + 12) % 12;
+        return QString::fromUtf8(names[i]) + QStringLiteral("时");
     }();
     p.setPen(QColor("#374151"));
     p.drawText(QRect(area.right() - 60, area.top(), 56, infoH), Qt::AlignRight | Qt::AlignTop, hourText);
