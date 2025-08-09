@@ -19,6 +19,7 @@ bool LoadMapJson(const std::string& path, MapData& out, std::string* err) {
     try {
         out.w = j.at("w").get<int>();
         out.h = j.at("h").get<int>();
+        out.version = j.value("version", 1);
         out.blocks.clear();
         if (j.contains("blocks")) {
             for (const auto& b : j["blocks"]) {

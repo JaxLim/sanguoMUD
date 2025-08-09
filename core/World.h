@@ -43,4 +43,5 @@ private:
     std::vector<std::vector<int>> FloodStepsFrom(Vec2 start) const; // BFS 距离场
     bool InBounds(Vec2 p) const { return p.x >= 0 && p.y >= 0 && p.x < w_ && p.y < h_; }
     std::string dataFolder_;
+    std::string mapFile_;
 };
