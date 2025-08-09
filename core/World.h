@@ -30,6 +30,8 @@ public:
 
     bool EnsureSpawnPassable();                                // 出生点自动调整
     std::optional<std::pair<EntityId, int>> NearestReachableNpc(EntityId from, int maxSteps) const; // 可达最近NPC
+
+    int hour() const { return hour_; }
 private:
     int w_=0, h_=0;
     std::vector<std::vector<int>> blocks_; // 0 walkable, 1 wall

@@ -3,6 +3,7 @@
 #include <QMouseEvent>
 #include <QFontMetrics>
 #include <QStringList>
+#include <QPropertyAnimation>
 
 MapWidget::MapWidget(World* world, QWidget* parent)
     : QWidget(parent), world_(world) {
@@ -24,6 +25,16 @@ void MapWidget::paintEvent(QPaintEvent*) {
     auto* player = world_->Find(world_->playerId());
     if (!player) return;
 
+    if (!hasLastPos_ || player->pos.x != lastPlayerPos_.x || player->pos.y != lastPlayerPos_.y) {
+        lastPlayerPos_ = player->pos;
+        hasLastPos_ = true;
+        QPropertyAnimation* anim = new QPropertyAnimation(this, "highlightColor");
+        anim->setDuration(300);
+        anim->setStartValue(QColor("#ffffff"));
+        anim->setEndValue(QColor("#fef9c3"));
+        anim->start(QAbstractAnimation::DeleteWhenStopped);
+    }
+
     const int gap = 12;
     int cellW = (area.width() - gap * 2) / 3;
     int cellH = (area.height() - gap * 2) / 3;
@@ -43,7 +54,7 @@ void MapWidget::paintEvent(QPaintEvent*) {
             walkable[idx][idy] = world_->Walkable(np);
             if (!walkable[idx][idy]) continue;
             if (dx == 0 && dy == 0) {
-                p.fillRect(cell, QColor("#fef9c3"));
+                p.fillRect(cell, highlightColor_);
             }
             QPen pen(QColor("#cbd5e1"));
             pen.setWidth(1);
@@ -86,6 +97,15 @@ void MapWidget::paintEvent(QPaintEvent*) {
             ids << e.id;
         }
     }
+
+    // draw current time at top-right of map area
+    auto hourText = [h = world_->hour()]() -> QString {
+        static const char* names[] = {"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"};
+        int idx = ((h % 24) + 1) / 2 % 12;
+        return QString::fromUtf8(names[idx]) + QStringLiteral("时");
+    }();
+    p.setPen(QColor("#374151"));
+    p.drawText(QRect(area.right() - 60, area.top(), 56, infoH), Qt::AlignRight | Qt::AlignTop, hourText);
 
     int y = height() - infoH + 4;
     int x = 4;

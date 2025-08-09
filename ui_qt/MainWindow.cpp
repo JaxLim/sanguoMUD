@@ -28,12 +28,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     leftPane->setMaximumWidth(320);
     auto* leftLayout = new QVBoxLayout(leftPane);
     leftLayout->setContentsMargins(12, 20, 12, 20);
-    leftLayout->setSpacing(20);
+    leftLayout->setSpacing(30);
 
     auto* grpMove = new QGroupBox(QStringLiteral("移动"), leftPane);
     auto* g = new QGridLayout();
-    g->setHorizontalSpacing(8);
-    g->setVerticalSpacing(12);
+    g->setHorizontalSpacing(12);
+    g->setVerticalSpacing(16);
     btnN_ = new QPushButton(QStringLiteral("▲"));
     btnS_ = new QPushButton(QStringLiteral("▼"));
     btnW_ = new QPushButton(QStringLiteral("◀"));
@@ -63,9 +63,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     grpInteract_ = new QGroupBox(QStringLiteral("交互"), leftPane);
     interactLayout_ = new QGridLayout();
-    interactLayout_->setContentsMargins(0, 8, 0, 8);
-    interactLayout_->setHorizontalSpacing(12);
-    interactLayout_->setVerticalSpacing(16);
+    interactLayout_->setContentsMargins(0, 12, 0, 12);
+    interactLayout_->setHorizontalSpacing(20);
+    interactLayout_->setVerticalSpacing(24);
     btnChat_ = new QPushButton(QStringLiteral("聊天"));
     btnObserve_ = new QPushButton(QStringLiteral("观察"));
     btnTouch_ = new QPushButton(QStringLiteral("触摸"));
@@ -86,9 +86,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     auto* grpSystem = new QGroupBox(QStringLiteral("系统"), leftPane);
     auto* gSystem = new QGridLayout();
-    gSystem->setContentsMargins(0, 8, 0, 8);
-    gSystem->setHorizontalSpacing(16);
-    gSystem->setVerticalSpacing(16);
+    gSystem->setContentsMargins(0, 12, 0, 12);
+    gSystem->setHorizontalSpacing(20);
+    gSystem->setVerticalSpacing(24);
     btnInfo_ = new QPushButton();
     btnBag_ = new QPushButton();
     btnSettings_ = new QPushButton();
@@ -142,10 +142,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
         "  background: rgba(255,255,255,0.55);"
         "}"
         "QGroupBox::title { subcontrol-origin: margin; left: 12px; padding: 0 4px; color: #6b7280; }"
-        "QPushButton { border: 1px solid #d4d4d8; border-radius: 8px; padding: 6px 10px; }"
-        "QPushButton:hover { background: #eef2ff; }"
-        "QPushButton:pressed { background: #e0e7ff; }"
-        "QPushButton:disabled { background: transparent; border: 1px dashed #d4d4d8; color: #9ca3af; }"
+        "QWidget#LeftPane QPushButton { border: 1px solid #5c4033; border-radius: 8px; padding: 6px 10px; background: #faf9f4 url(:/textures/paper.png); }"
+        "QWidget#LeftPane QPushButton:hover { background-color: rgba(255,255,255,0.6); }"
+        "QWidget#LeftPane QPushButton:pressed { background-color: rgba(230,230,230,0.6); }"
+        "QWidget#LeftPane QPushButton:disabled { background: transparent; border: 1px dashed #d4d4d8; color: #9ca3af; }"
         "QTextEdit { background: #ffffff; selection-background-color: #e5e7eb; }"
         "QStatusBar { color: #374151; }"
     );
