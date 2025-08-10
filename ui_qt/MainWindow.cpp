@@ -265,11 +265,11 @@ void MainWindow::onChat() {
 }
 
 void MainWindow::onObserve() {
-    if (selectedNpc_) append(QStringLiteral("你仔细地观察了对方。"), QColor("#2563eb"));
+    if (selectedNpc_) append(QString::fromStdString(world_.Interact(world_.playerId(), selectedNpc_, "观察")), QColor("#2563eb"));
 }
 
 void MainWindow::onTouch() {
-    if (selectedNpc_) append(QStringLiteral("你摸了摸对方。"), QColor("#2563eb"));
+    if (selectedNpc_) append(QString::fromStdString(world_.Interact(world_.playerId(), selectedNpc_, "触摸")), QColor("#2563eb"));
 }
 
 void MainWindow::onAttack() {
@@ -277,10 +277,11 @@ void MainWindow::onAttack() {
 }
 
 void MainWindow::onTrade() {
-    if (selectedNpc_) append(QStringLiteral("目前没有可交易的物品。"), QColor("#2563eb"));
+    if (selectedNpc_) append(QString::fromStdString(world_.Interact(world_.playerId(), selectedNpc_, "交易")), QColor("#2563eb"));
 }
 
 void MainWindow::onLeave() {
+    if (selectedNpc_) append(QString::fromStdString(world_.Interact(world_.playerId(), selectedNpc_, "离开")), QColor("#2563eb"));
     clearInteraction();
 }
 
