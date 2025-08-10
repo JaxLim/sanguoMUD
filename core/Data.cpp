@@ -102,3 +102,27 @@ bool LoadDialogsJson(const std::string& path, DialogMap& out, std::string* err) 
     }
 }
 
+bool LoadNpcsJson(const std::string& path, std::vector<NpcDef>& out, std::string* err) {
+    json j;
+    if (!read_json(path, j, err)) return false;
+    try {
+        out.clear();
+        for (const auto& item : j) {
+            NpcDef npc;
+            npc.name = item.value("name", std::string{});
+            npc.tile = item.value("tile", std::string{});
+            if (item.contains("interactions")) {
+                for (auto it = item["interactions"].begin(); it != item["interactions"].end(); ++it) {
+                    npc.interactions[it.key()] = it.value().get<std::string>();
+                }
+            }
+            out.push_back(std::move(npc));
+        }
+        return true;
+    }
+    catch (const std::exception& e) {
+        if (err) *err = std::string("npc.json 解析失败: ") + e.what();
+        return false;
+    }
+}
+

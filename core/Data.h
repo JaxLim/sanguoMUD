@@ -21,6 +21,13 @@ struct MapData {
 
 using DialogMap = std::unordered_map<int, std::vector<std::string>>; // npcId -> lines
 
+struct NpcDef {
+        std::string name;                                 // NPC名称
+        std::string tile;                                 // 所在地块名称
+        std::unordered_map<std::string, std::string> interactions; // 行为 -> 文本
+};
+
 bool LoadMapJson(const std::string& path, MapData& out, std::string* err = nullptr);
 bool LoadEntitiesJson(const std::string& path, std::vector<Entity>& out, std::string* err = nullptr);
 bool LoadDialogsJson(const std::string& path, DialogMap& out, std::string* err = nullptr);
+bool LoadNpcsJson(const std::string& path, std::vector<NpcDef>& out, std::string* err = nullptr);

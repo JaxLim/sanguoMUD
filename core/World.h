@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <optional>
+#include <unordered_map>
 #include "Entity.h"
 #include "Data.h"
 #include "GameClock.h"
@@ -16,6 +17,7 @@ public:
     bool Move(EntityId id, Vec2 dxy);
     std::string Talk(EntityId a, EntityId b);
     std::string Attack(EntityId a, EntityId b);
+    std::string Interact(EntityId a, EntityId b, const std::string& action);
 
     int width() const { return w_; }
     int height() const { return h_; }
@@ -45,4 +47,7 @@ private:
     bool InBounds(Vec2 p) const { return p.x >= 0 && p.y >= 0 && p.x < w_ && p.y < h_; }
     std::string dataFolder_;
     std::string mapFile_;
+    struct NpcInfo { std::unordered_map<std::string, std::string> interactions; };
+    std::unordered_map<EntityId, NpcInfo> npcData_;
+    std::string AttackCombat(EntityId a, EntityId b);
 };

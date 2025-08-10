@@ -72,6 +72,25 @@ bool World::LoadData(const std::string& folder) {
     DialogMap dlg;
     LoadDialogsJson((dir / "dialogs.json").generic_string(), dlg, &err); // 读不到也不致命
 
+    std::vector<NpcDef> npcs;
+    if (LoadNpcsJson((dir / "npc.json").generic_string(), npcs, &err)) {
+        int nextId = 1;
+        for (const auto& e : entities_) nextId = std::max(nextId, e.id + 1);
+        for (auto& n : npcs) {
+            auto it = std::find_if(m.tags.begin(), m.tags.end(), [&](const MapData::Tag& t) {
+                return t.name == n.tile || t.id == n.tile;
+                });
+            if (it == m.tags.end()) continue;
+            Entity ent;
+            ent.id = nextId++;
+            ent.name = n.name;
+            ent.pos = { it->x, it->y };
+            ent.stats.hp = 20; ent.stats.str = 5; ent.stats.dex = 5; ent.stats.morale = 50;
+            entities_.push_back(ent);
+            npcData_[ent.id].interactions = std::move(n.interactions);
+        }
+    }
+
     EnsureSpawnPassable();
     return true;
 }
@@ -102,13 +121,7 @@ bool World::Move(EntityId id, Vec2 d){
     e->pos = np; return true;
 }
 
-std::string World::Talk(EntityId a, EntityId b){
-    const Entity* me = Find(a), *other = Find(b);
-    if(!me||!other) return "没人回应你。";
-    return other->name + "：……好吧，北面有巡逻。";
-}
-
-std::string World::Attack(EntityId a, EntityId b){
+std::string World::AttackCombat(EntityId a, EntityId b){
     auto* A = Find(a); auto* B = Find(b);
     if(!A||!B) return "空气被你揍了一拳。";
     int hc = hitChance(A->stats, B->stats);
@@ -120,6 +133,31 @@ std::string World::Attack(EntityId a, EntityId b){
     }else{
         return A->name+"挥空了。";
     }
+}
+
+std::string World::Interact(EntityId a, EntityId b, const std::string& action){
+    auto it = npcData_.find(b);
+    if(it != npcData_.end()){
+        auto jt = it->second.interactions.find(action);
+        if(jt != it->second.interactions.end()) return jt->second;
+    }
+    if(action == "聊天"){
+        const Entity* me = Find(a), *other = Find(b);
+        if(!me||!other) return "没人回应你。";
+        return other->name + "对你无话可说。";
+    }
+    if(action == "攻击"){
+        return AttackCombat(a,b);
+    }
+    return "对方没有回应。";
+}
+
+std::string World::Talk(EntityId a, EntityId b){
+    return Interact(a,b,"聊天");
+}
+
+std::string World::Attack(EntityId a, EntityId b){
+    return Interact(a,b,"攻击");
 }
 
 std::string World::TagName(Vec2 p) const {
