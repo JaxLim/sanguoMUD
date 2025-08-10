@@ -13,9 +13,6 @@ add_executable(ui_qt
   MapWidget.h
 )
 
-qt5_add_resources(ui_qt_resources resources/ui_qt.qrc)
-target_sources(ui_qt PRIVATE ${ui_qt_resources})
-
 target_link_libraries(ui_qt PRIVATE core Qt${QT_VERSION_MAJOR}::Widgets)
 target_include_directories(ui_qt PRIVATE ${CMAKE_SOURCE_DIR}/core)
 
