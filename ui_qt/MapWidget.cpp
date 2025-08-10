@@ -10,6 +10,7 @@ MapWidget::MapWidget(World* world, QWidget* parent)
     setMinimumHeight(200);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setMouseTracking(true);
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 void MapWidget::paintEvent(QPaintEvent*) {
