@@ -79,7 +79,11 @@ bool World::LoadData(const std::string& folder) {
 
 bool World::Walkable(Vec2 p) const {
     if(p.x<0||p.y<0||p.x>=w_||p.y>=h_) return false;
-    return blocks_[p.y][p.x]==0;
+    if(blocks_[p.y][p.x]==1) return false;
+    for(const auto& t: tags_){
+        if(t.x==p.x && t.y==p.y && !t.walkable) return false;
+    }
+    return true;
 }
 
 Entity* World::Find(EntityId id){
@@ -121,23 +125,31 @@ std::string World::Attack(EntityId a, EntityId b){
 std::string World::TagName(Vec2 p) const {
     for (const auto& t : tags_) {
         if (t.x == p.x && t.y == p.y) {
-            if (t.type == "forest") return "树林";
-            if (t.type == "river") return "河边";
-            if (t.type == "smith") return "铁匠铺";
-            if (t.type == "shop") return "商铺";
-            if (t.type == "gate") return "城门";
-            if (t.type == "house") return "李府";
-            return t.type;
+            if (!t.name.empty()) return t.name;
+            if (t.id == "forest") return "树林";
+            if (t.id == "river") return "河边";
+            if (t.id == "smith") return "铁匠铺";
+            if (t.id == "shop") return "商铺";
+            if (t.id == "gate") return "城门";
+            if (t.id == "house") return "李府";
+            if (!t.id.empty()) return t.id;
         }
     }
     return "街道";
+}
+
+std::string World::TagDesc(Vec2 p) const {
+    for (const auto& t : tags_) {
+        if (t.x == p.x && t.y == p.y) return t.desc;
+    }
+    return {};
 }
 
 std::string World::Save(const std::string& path) const {
     json j;
     j["w"] = w_; j["h"] = h_;
     j["day"] = clock_.dayCount();
-    j["day_ms"] = clock_.dayMs();
+    j["msInDay"] = clock_.dayMs();
     j["entities"] = json::array();
     for (const auto& e : entities_) {
         j["entities"].push_back({
@@ -168,7 +180,7 @@ std::string World::Load(const std::string& path) {
     w_ = j.value("w", w_);
     h_ = j.value("h", h_);
     int d = j.value("day", 1);
-    int ms = j.value("day_ms", 0);
+    int ms = j.value("msInDay", j.value("day_ms", 0));
     clock_.set(d, ms);
 
     entities_.clear();

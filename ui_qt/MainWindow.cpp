@@ -222,28 +222,36 @@ void MainWindow::append(const QString& s, const QColor& color) {
 void MainWindow::refreshHud() {
     static const char* names[] = {"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"};
     int idx = world_.clock().shichen() % 12;
-    QString msg = QString::fromUtf8(names[idx]) + QStringLiteral("时 第") + QString::number(world_.clock().dayCount()) + QStringLiteral("日");
+    QString msg = QStringLiteral("第") + QString::number(world_.clock().dayCount()) + QStringLiteral("日·") + QString::fromUtf8(names[idx]) + QStringLiteral("时");
     statusBar()->showMessage(msg);
     if (map_) map_->update();
 }
 
 void MainWindow::onMoveNorth() {
     append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "north", {}})), QColor("#6b7280"));
+    if (auto desc = QString::fromStdString(world_.TagDesc(world_.Find(world_.playerId())->pos)); !desc.isEmpty())
+        append(desc);
     refreshHud();
 }
 
 void MainWindow::onMoveSouth() {
     append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "south", {}})), QColor("#6b7280"));
+    if (auto desc = QString::fromStdString(world_.TagDesc(world_.Find(world_.playerId())->pos)); !desc.isEmpty())
+        append(desc);
     refreshHud();
 }
 
 void MainWindow::onMoveWest() {
     append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "west", {}})), QColor("#6b7280"));
+    if (auto desc = QString::fromStdString(world_.TagDesc(world_.Find(world_.playerId())->pos)); !desc.isEmpty())
+        append(desc);
     refreshHud();
 }
 
 void MainWindow::onMoveEast() {
     append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "east", {}})), QColor("#6b7280"));
+    if (auto desc = QString::fromStdString(world_.TagDesc(world_.Find(world_.playerId())->pos)); !desc.isEmpty())
+        append(desc);
     refreshHud();
 }
 
