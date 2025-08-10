@@ -66,12 +66,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     interactLayout_->setContentsMargins(0, 12, 0, 12);
     interactLayout_->setHorizontalSpacing(25);
     interactLayout_->setVerticalSpacing(30);
-    btnChat_ = new QPushButton(QStringLiteral("聊天"));
-    btnObserve_ = new QPushButton(QStringLiteral("观察"));
-    btnTouch_ = new QPushButton(QStringLiteral("触摸"));
-    btnAttack_ = new QPushButton(QStringLiteral("攻击"));
-    btnTrade_ = new QPushButton(QStringLiteral("交易"));
-    btnLeave_ = new QPushButton(QStringLiteral("离开"));
+    btnChat_ = new QPushButton(QStringLiteral("聊天(J)"));
+    btnObserve_ = new QPushButton(QStringLiteral("观察(K)"));
+    btnTouch_ = new QPushButton(QStringLiteral("触摸(L)"));
+    btnAttack_ = new QPushButton(QStringLiteral("攻击(H)"));
+    btnTrade_ = new QPushButton(QStringLiteral("交易(U)"));
+    btnLeave_ = new QPushButton(QStringLiteral("离开(O)"));
     btnChat_->setToolTip("J");
     btnObserve_->setToolTip("K");
     btnTouch_->setToolTip("L");
