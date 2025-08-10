@@ -13,6 +13,8 @@ public:
     QColor highlightColor() const { return highlightColor_; }
     void setHighlightColor(const QColor& c) { highlightColor_ = c; update(); }
 
+    void setSelectedNpc(int id) { selectedNpc_ = id; update(); }
+
 signals:
     void npcClicked(int id);
 
@@ -27,4 +29,6 @@ private:
     Vec2 lastPlayerPos_{};
     bool hasLastPos_ = false;
     QColor highlightColor_ { QColor("#fef9c3") };
+    int selectedNpc_ = 0;
+    int hoveredNpc_ = 0;
 };
