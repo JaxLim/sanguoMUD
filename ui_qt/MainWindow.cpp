@@ -231,6 +231,7 @@ void MainWindow::onMoveNorth() {
     append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "north", {}})), QColor("#6b7280"));
     if (auto desc = QString::fromStdString(world_.TagDesc(world_.Find(world_.playerId())->pos)); !desc.isEmpty())
         append(desc);
+    clearInteraction();
     refreshHud();
 }
 
@@ -238,6 +239,7 @@ void MainWindow::onMoveSouth() {
     append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "south", {}})), QColor("#6b7280"));
     if (auto desc = QString::fromStdString(world_.TagDesc(world_.Find(world_.playerId())->pos)); !desc.isEmpty())
         append(desc);
+    clearInteraction();
     refreshHud();
 }
 
@@ -245,6 +247,7 @@ void MainWindow::onMoveWest() {
     append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "west", {}})), QColor("#6b7280"));
     if (auto desc = QString::fromStdString(world_.TagDesc(world_.Find(world_.playerId())->pos)); !desc.isEmpty())
         append(desc);
+    clearInteraction();
     refreshHud();
 }
 
@@ -252,11 +255,13 @@ void MainWindow::onMoveEast() {
     append(QString::fromStdString(Execute(world_, world_.playerId(), {"go", "east", {}})), QColor("#6b7280"));
     if (auto desc = QString::fromStdString(world_.TagDesc(world_.Find(world_.playerId())->pos)); !desc.isEmpty())
         append(desc);
+    clearInteraction();
     refreshHud();
 }
 
 void MainWindow::onNpcClicked(int id) {
     selectedNpc_ = id;
+    map_->setSelectedNpc(id);
     for (auto btn : {btnChat_, btnObserve_, btnTouch_, btnAttack_, btnTrade_, btnLeave_}) btn->show();
 }
 
@@ -287,6 +292,7 @@ void MainWindow::onLeave() {
 
 void MainWindow::clearInteraction() {
     selectedNpc_ = 0;
+    if (map_) map_->setSelectedNpc(0);
     for (auto btn : {btnChat_, btnObserve_, btnTouch_, btnAttack_, btnTrade_, btnLeave_}) btn->hide();
 }
 
@@ -297,6 +303,7 @@ void MainWindow::onSave() {
 void MainWindow::onLoad() {
     append(QString::fromStdString(world_.Load("save1.json")), QColor("#6b7280"));
     lastShichen_ = world_.clock().shichen();
+    clearInteraction();
     refreshHud();
 }
 

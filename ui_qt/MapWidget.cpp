@@ -129,10 +129,21 @@ void MapWidget::paintEvent(QPaintEvent*) {
             const QString& nm = names[i];
             int w = fm.horizontalAdvance(nm) + 16;
             QRect tag(x, y, w, infoH - 8);
+
+            QColor fill("#e5e7eb");
+            QColor text("#374151");
+            if (ids[i] == selectedNpc_) {
+                fill = QColor("#facc15");
+                text = QColor("#78350f");
+            } else if (ids[i] == hoveredNpc_) {
+                fill = QColor("#f3f4f6");
+                text = QColor("#111827");
+            }
+
             p.setPen(Qt::NoPen);
-            p.setBrush(QColor("#e5e7eb"));
+            p.setBrush(fill);
             p.drawRoundedRect(tag, (infoH - 8) / 2, (infoH - 8) / 2);
-            p.setPen(QColor("#374151"));
+            p.setPen(text);
             p.drawText(tag, Qt::AlignCenter, nm);
             npcRects_.push_back({ tag, ids[i] });
             x += w + 6;
@@ -147,14 +158,22 @@ void MapWidget::mouseReleaseEvent(QMouseEvent* e) {
     QPoint pt = e->pos();
     for (auto& pr : npcRects_) {
         if (pr.first.contains(pt)) {
+            setSelectedNpc(pr.second);
             emit npcClicked(pr.second);
-            break;
+            return;
         }
     }
 }
 
 void MapWidget::mouseMoveEvent(QMouseEvent* e) {
     if (!world_) { setToolTip(QString()); return; }
+
+    int hover = 0;
+    for (auto& pr : npcRects_) {
+        if (pr.first.contains(e->pos())) { hover = pr.second; break; }
+    }
+    if (hoveredNpc_ != hover) { hoveredNpc_ = hover; update(); }
+    if (hover) { setToolTip(QString()); return; }
     const int infoH = 32;
     QRect area = rect().adjusted(0, 0, 0, -infoH);
     auto* player = world_->Find(world_->playerId());
