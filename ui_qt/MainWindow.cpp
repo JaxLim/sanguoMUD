@@ -72,13 +72,19 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     btnAttack_ = new QPushButton(QStringLiteral("攻击"));
     btnTrade_ = new QPushButton(QStringLiteral("交易"));
     btnLeave_ = new QPushButton(QStringLiteral("离开"));
+    btnChat_->setToolTip("J");
+    btnObserve_->setToolTip("K");
+    btnTouch_->setToolTip("L");
+    btnAttack_->setToolTip("H");
+    btnTrade_->setToolTip("U");
+    btnLeave_->setToolTip("O");
     QList<QPushButton*> ibtns{btnChat_, btnObserve_, btnTouch_, btnAttack_, btnTrade_, btnLeave_};
     for (int i = 0; i < ibtns.size(); ++i) {
         auto btn = ibtns[i];
         btn->setMinimumSize(92, 36);
         btn->setAutoDefault(false);
         btn->setDefault(false);
-        btn->hide();
+        btn->setEnabled(false);
         interactLayout_->addWidget(btn, i / 3, i % 3);
     }
     grpInteract_->setLayout(interactLayout_);
@@ -160,12 +166,18 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     lastShichen_ = world_.clock().shichen();
     refreshHud();
 
-    auto actN = new QAction(this); actN->setShortcut(QKeySequence("W")); connect(actN, &QAction::triggered, this, &MainWindow::onMoveNorth); addAction(actN);
-    auto actS = new QAction(this); actS->setShortcut(QKeySequence("S")); connect(actS, &QAction::triggered, this, &MainWindow::onMoveSouth); addAction(actS);
-    auto actW = new QAction(this); actW->setShortcut(QKeySequence("A")); connect(actW, &QAction::triggered, this, &MainWindow::onMoveWest); addAction(actW);
-    auto actE = new QAction(this); actE->setShortcut(QKeySequence("D")); connect(actE, &QAction::triggered, this, &MainWindow::onMoveEast); addAction(actE);
-    auto actSave = new QAction(this); actSave->setShortcut(QKeySequence("F5")); connect(actSave, &QAction::triggered, this, &MainWindow::onSave); addAction(actSave);
-    auto actLoad = new QAction(this); actLoad->setShortcut(QKeySequence("F9")); connect(actLoad, &QAction::triggered, this, &MainWindow::onLoad); addAction(actLoad);
+    auto actN = new QAction(this); actN->setShortcut(QKeySequence("W")); connect(actN, &QAction::triggered, btnN_, &QPushButton::click); addAction(actN);
+    auto actS = new QAction(this); actS->setShortcut(QKeySequence("S")); connect(actS, &QAction::triggered, btnS_, &QPushButton::click); addAction(actS);
+    auto actW = new QAction(this); actW->setShortcut(QKeySequence("A")); connect(actW, &QAction::triggered, btnW_, &QPushButton::click); addAction(actW);
+    auto actE = new QAction(this); actE->setShortcut(QKeySequence("D")); connect(actE, &QAction::triggered, btnE_, &QPushButton::click); addAction(actE);
+    auto actChat = new QAction(this); actChat->setShortcut(QKeySequence("J")); connect(actChat, &QAction::triggered, btnChat_, &QPushButton::click); addAction(actChat);
+    auto actObserve = new QAction(this); actObserve->setShortcut(QKeySequence("K")); connect(actObserve, &QAction::triggered, btnObserve_, &QPushButton::click); addAction(actObserve);
+    auto actTouch = new QAction(this); actTouch->setShortcut(QKeySequence("L")); connect(actTouch, &QAction::triggered, btnTouch_, &QPushButton::click); addAction(actTouch);
+    auto actAttack = new QAction(this); actAttack->setShortcut(QKeySequence("H")); connect(actAttack, &QAction::triggered, btnAttack_, &QPushButton::click); addAction(actAttack);
+    auto actTrade = new QAction(this); actTrade->setShortcut(QKeySequence("U")); connect(actTrade, &QAction::triggered, btnTrade_, &QPushButton::click); addAction(actTrade);
+    auto actLeave = new QAction(this); actLeave->setShortcut(QKeySequence("O")); connect(actLeave, &QAction::triggered, btnLeave_, &QPushButton::click); addAction(actLeave);
+    auto actSave = new QAction(this); actSave->setShortcut(QKeySequence("F5")); connect(actSave, &QAction::triggered, btnSave_, &QPushButton::click); addAction(actSave);
+    auto actLoad = new QAction(this); actLoad->setShortcut(QKeySequence("F9")); connect(actLoad, &QAction::triggered, btnLoad_, &QPushButton::click); addAction(actLoad);
 
     connect(btnN_, &QPushButton::clicked, this, &MainWindow::onMoveNorth);
     connect(btnS_, &QPushButton::clicked, this, &MainWindow::onMoveSouth);
@@ -262,7 +274,7 @@ void MainWindow::onMoveEast() {
 void MainWindow::onNpcClicked(int id) {
     selectedNpc_ = id;
     map_->setSelectedNpc(id);
-    for (auto btn : {btnChat_, btnObserve_, btnTouch_, btnAttack_, btnTrade_, btnLeave_}) btn->show();
+    for (auto btn : {btnChat_, btnObserve_, btnTouch_, btnAttack_, btnTrade_, btnLeave_}) btn->setEnabled(true);
 }
 
 void MainWindow::onChat() {
@@ -293,7 +305,7 @@ void MainWindow::onLeave() {
 void MainWindow::clearInteraction() {
     selectedNpc_ = 0;
     if (map_) map_->setSelectedNpc(0);
-    for (auto btn : {btnChat_, btnObserve_, btnTouch_, btnAttack_, btnTrade_, btnLeave_}) btn->hide();
+    for (auto btn : {btnChat_, btnObserve_, btnTouch_, btnAttack_, btnTrade_, btnLeave_}) btn->setEnabled(false);
 }
 
 void MainWindow::onSave() {
