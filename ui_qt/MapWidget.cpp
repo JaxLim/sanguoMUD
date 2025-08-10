@@ -52,7 +52,17 @@ void MapWidget::paintEvent(QPaintEvent*) {
             cells[idx][idy] = cell;
             Vec2 np{ player->pos.x + dx, player->pos.y + dy };
             walkable[idx][idy] = world_->Walkable(np);
-            if (!walkable[idx][idy]) continue;
+            if (!walkable[idx][idy]) {
+                QPen pen(QColor("#e5e7eb"));
+                pen.setWidth(1);
+                p.setPen(pen);
+                p.setBrush(Qt::NoBrush);
+                p.drawRoundedRect(cell, 6, 6);
+                QString name = QString::fromStdString(world_->TagName(np));
+                p.setPen(QColor("#9ca3af"));
+                p.drawText(cell, Qt::AlignCenter, name);
+                continue;
+            }
             if (dx == 0 && dy == 0) {
                 p.fillRect(cell, highlightColor_);
             }
@@ -161,8 +171,10 @@ void MapWidget::mouseMoveEvent(QMouseEvent* e) {
             QRect cell(ox + (dx + 1) * (cellW + gap), oy + (dy + 1) * (cellH + gap), cellW, cellH);
             if (!cell.contains(e->pos())) continue;
             Vec2 np{ player->pos.x + dx, player->pos.y + dy };
-            if (!world_->Walkable(np)) { setToolTip(QString()); return; }
             QString tip = QString::fromStdString(world_->TagName(np));
+            QString desc = QString::fromStdString(world_->TagDesc(np));
+            if (!desc.isEmpty()) tip += QStringLiteral("\n") + desc;
+            if (!world_->Walkable(np)) tip += QStringLiteral("\n（不可进入）");
             QStringList names;
             for (const auto& en : world_->entities()) {
                 if (en.id != player->id && en.pos.x == np.x && en.pos.y == np.y) {

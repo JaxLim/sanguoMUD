@@ -9,7 +9,13 @@ struct MapData {
         int version = 1;
         std::vector<std::pair<int, int>> blocks;
         // 可选：带标签地形
-        struct Tag { int x, y; std::string type; };
+        struct Tag {
+                int x, y;                     // 位置
+                std::string id;               // 唯一标识
+                std::string name;             // 显示名称
+                std::string desc;             // 描述
+                bool walkable = true;         // 是否可通行
+        };
         std::vector<Tag> tags;
 };
 

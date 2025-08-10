@@ -32,7 +32,13 @@ bool LoadMapJson(const std::string& path, MapData& out, std::string* err) {
                 MapData::Tag tg;
                 tg.x = t.at("pos").at(0).get<int>();
                 tg.y = t.at("pos").at(1).get<int>();
-                tg.type = t.at("type").get<std::string>();
+                // 兼容旧字段：如果只有 type，则作为 id/name
+                if (t.contains("id")) tg.id = t.at("id").get<std::string>();
+                if (t.contains("name")) tg.name = t.at("name").get<std::string>();
+                if (tg.id.empty() && t.contains("type")) tg.id = t.at("type").get<std::string>();
+                if (tg.name.empty() && t.contains("type")) tg.name = t.at("type").get<std::string>();
+                tg.desc = t.value("desc", std::string{});
+                tg.walkable = t.value("walkable", true);
                 out.tags.push_back(tg);
             }
         }

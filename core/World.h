@@ -27,6 +27,7 @@ public:
     Entity* Find(EntityId id);
 
     std::string TagName(Vec2 p) const;                     // 地块名称
+    std::string TagDesc(Vec2 p) const;                     // 地块描述
 
     bool EnsureSpawnPassable();                                // 出生点自动调整
     std::optional<std::pair<EntityId, int>> NearestReachableNpc(EntityId from, int maxSteps) const; // 可达最近NPC
