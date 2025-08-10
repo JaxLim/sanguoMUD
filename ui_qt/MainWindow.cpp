@@ -148,7 +148,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
         "  background: rgba(255,255,255,0.55);"
         "}"
         "QGroupBox::title { subcontrol-origin: margin; left: 12px; padding: 0 4px; color: #6b7280; }"
-        "QWidget#LeftPane QPushButton { border: 1px solid #5c4033; border-radius: 8px; padding: 6px 10px; background: #faf9f4 url(:/textures/paper.png); }"
+        "QWidget#LeftPane QPushButton { border: 1px solid #5c4033; border-radius: 8px; padding: 6px 10px; background: #faf9f4; }"
         "QWidget#LeftPane QPushButton:hover { background-color: rgba(255,255,255,0.6); }"
         "QWidget#LeftPane QPushButton:pressed { background-color: rgba(230,230,230,0.6); }"
         "QWidget#LeftPane QPushButton:disabled { background: transparent; border: 1px dashed #d4d4d8; color: #9ca3af; }"
