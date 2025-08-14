@@ -19,7 +19,7 @@ private:
     World world_;
     MapWidget* map_;
     QTextEdit* log_;
-    QPushButton *btnN_,*btnS_,*btnW_,*btnE_,*btnInfo_,*btnBag_,*btnSettings_,*btnSave_,*btnLoad_,*btnClear_;
+    QPushButton *btnN_,*btnS_,*btnW_,*btnE_,*btnInfo_,*btnBag_,*btnSettings_,*btnSave_,*btnLoad_,*btnClear_,*btnMap_;
     QGroupBox* grpInteract_;
     QGridLayout* interactLayout_;
     QPushButton *btnChat_,*btnObserve_,*btnTouch_,*btnAttack_,*btnTrade_,*btnLeave_;
@@ -28,6 +28,7 @@ private:
     int tick_=0;
     int lastShichen_ = -1;
     QString dataVersion_;
+    class FullMapWindow* fullMap_ = nullptr;
     void append(const QString& s, const QColor& color=Qt::black);
     void refreshHud();
     void onMoveNorth();
@@ -48,4 +49,5 @@ private:
     void onSave();
     void onLoad();
     void onClear();
+    void onMap();
 };

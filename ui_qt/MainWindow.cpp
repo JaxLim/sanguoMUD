@@ -14,6 +14,7 @@
 #include <QTextCursor>
 #include <QSizePolicy>
 #include "MapWidget.h"
+#include "FullMapWindow.h"
 #include "../core/Command.h"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
@@ -101,7 +102,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     btnSave_ = new QPushButton();
     btnLoad_ = new QPushButton();
     btnClear_ = new QPushButton();
-    QList<QPushButton*> sysBtns{btnInfo_, btnBag_, btnSettings_, btnSave_, btnLoad_, btnClear_};
+    btnMap_ = new QPushButton();
+    QList<QPushButton*> sysBtns{btnInfo_, btnBag_, btnSettings_, btnSave_, btnLoad_, btnClear_, btnMap_};
     for (auto btn : sysBtns) {
         btn->setMinimumSize(92, 36);
         btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -114,12 +116,15 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     btnSave_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"存档 (F5)")));
     btnLoad_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"读档 (F9)")));
     btnClear_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"清屏")));
+    btnMap_->setText(QString::fromUtf8(reinterpret_cast<const char*>(u8"地图(M)")));
+    btnMap_->setToolTip("M");
     gSystem->addWidget(btnInfo_, 0, 0);
     gSystem->addWidget(btnBag_, 0, 1);
     gSystem->addWidget(btnSettings_, 0, 2);
     gSystem->addWidget(btnSave_, 1, 0);
     gSystem->addWidget(btnLoad_, 1, 1);
     gSystem->addWidget(btnClear_, 1, 2);
+    gSystem->addWidget(btnMap_, 2, 0);
     for (int i = 0; i < 3; ++i) gSystem->setColumnStretch(i, 1);
     grpSystem->setLayout(gSystem);
     leftLayout->addWidget(grpSystem);
@@ -178,6 +183,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     auto actLeave = new QAction(this); actLeave->setShortcut(QKeySequence("O")); connect(actLeave, &QAction::triggered, btnLeave_, &QPushButton::click); addAction(actLeave);
     auto actSave = new QAction(this); actSave->setShortcut(QKeySequence("F5")); connect(actSave, &QAction::triggered, btnSave_, &QPushButton::click); addAction(actSave);
     auto actLoad = new QAction(this); actLoad->setShortcut(QKeySequence("F9")); connect(actLoad, &QAction::triggered, btnLoad_, &QPushButton::click); addAction(actLoad);
+    auto actMap = new QAction(this); actMap->setShortcut(QKeySequence("M")); connect(actMap, &QAction::triggered, this, &MainWindow::onMap); addAction(actMap);
 
     connect(btnN_, &QPushButton::clicked, this, &MainWindow::onMoveNorth);
     connect(btnS_, &QPushButton::clicked, this, &MainWindow::onMoveSouth);
@@ -196,6 +202,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     connect(btnSave_, &QPushButton::clicked, this, &MainWindow::onSave);
     connect(btnLoad_, &QPushButton::clicked, this, &MainWindow::onLoad);
     connect(btnClear_, &QPushButton::clicked, this, &MainWindow::onClear);
+    connect(btnMap_, &QPushButton::clicked, this, &MainWindow::onMap);
 
     timer_ = new QTimer(this);
     timer_->setInterval(500);
@@ -237,6 +244,7 @@ void MainWindow::refreshHud() {
     QString msg = QStringLiteral("第") + QString::number(world_.clock().dayCount()) + QStringLiteral("日·") + QString::fromUtf8(names[idx]) + QStringLiteral("时");
     statusBar()->showMessage(msg);
     if (map_) map_->update();
+    if (fullMap_) fullMap_->update();
 }
 
 void MainWindow::onMoveNorth() {
@@ -321,6 +329,18 @@ void MainWindow::onLoad() {
 
 void MainWindow::onClear() {
     log_->clear();
+}
+
+void MainWindow::onMap() {
+    if (!fullMap_) {
+        fullMap_ = new FullMapWindow(&world_);
+        fullMap_->setAttribute(Qt::WA_DeleteOnClose);
+        connect(fullMap_, &QObject::destroyed, this, [this]() { fullMap_ = nullptr; });
+    }
+    fullMap_->show();
+    fullMap_->raise();
+    fullMap_->activateWindow();
+    fullMap_->update();
 }
 
 void MainWindow::onInfo() {
