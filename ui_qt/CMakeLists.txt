@@ -11,6 +11,8 @@ add_executable(ui_qt
   MainWindow.h
   MapWidget.cpp
   MapWidget.h
+  FullMapWindow.cpp
+  FullMapWindow.h
 )
 
 target_link_libraries(ui_qt PRIVATE core Qt${QT_VERSION_MAJOR}::Widgets)
